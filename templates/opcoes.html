@@ -1,20 +1,232 @@
-{% extends "layout.html" %}
-{% block body %}
-<div class="botoes_gerar_consultar">
-   <div class="custom-card2">
-      <h1 style="font-size: 30px;">Selecione uma opção:</h1>
-      <div class="opcoes_botoes">
-         <a href="/"><button class="gerar_proposta">Gerar Proposta</button></a>
-         <a href="/consulta"><button class="consulta_precos">Consulta de preços</button></a>
-         <button class="cadastrar_cliente" name="Cadastrar" id="modal-cadastrar-cliente">Cadastrar Cliente</button>
-         <button class="interacao_cliente" name="Interações" id="botao-modal-interacao">Interações</button>
-         <button class="pedidos_cliente btn-info" name="pedidos" id="pedidos-ganhos">Pedidos</button>
+{% extends "base.html" %}
+
+{% block links %}
+    <!-- CSS datatable -->
+    <link href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/botoes.css">
+
+{% endblock %}
+
+{% block container %}
+<div class="container-fluid">
+   <div class="row">
+      <div class="col-md-6 mb-3">
+         <div class="card shadow mb-4">
+            <div class="card-header py-3">
+               <h6 class="m-0 font-weight-bold" style="color:#ffa171;">Gerar proposta</h6>
+            </div>
+            <div class="card-body">
+               <div style="display: flex; flex-direction: column; align-items: center;">
+                  <img src="/static/img/undraw_chore_list_re_2lq8.svg" width="180" height="180">
+                  <p>***Descrição intuitiva para explicar o campo de gerar proposta aos representantes</p>
+               </div>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end;">
+               <a href="/"><button class="btn-gerar">Gerar proposta</button></a>
+            </div>
+         </div>
+      </div>
+      <div class="col-md-6 mb-3">
+         <div class="card shadow mb-4">
+            <div class="card-header py-3">
+               <h6 class="m-0 font-weight-bold" style="color: #36b9cc;">Consultar preços</h6>
+            </div>
+            <div class="card-body">
+               <div style="display: flex; flex-direction: column; align-items: center;">
+                  <img src="/static/img/undraw_file_searching_re_3evy.svg" width="180" height="180">
+                  <p>***Descrição intuitiva para explicar o campo de consulta de preços aos representantes</p>
+               </div>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end;">
+               <a href="/consulta"><button class="btn btn-info">Consultar</button></a>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div class="row">
+      <div class="col-md-6 mb-3">
+         <div class="card shadow mb-4">
+            <div class="card-header py-3">
+               <h6 class="m-0 font-weight-bold text-primary">Cadastrar Cliente</h6>
+            </div>
+            <div class="card-body">
+               <div style="display: flex; flex-direction: column; align-items: center;">
+                  <img src="/static/img/undraw_sign_up_n6im.svg" width="180" height="180">
+                  <p>***Descrição intuitiva para explicar o campo de cadastrar cliente aos representantes</p>
+               </div>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end;">
+               <button class="btn btn-primary" name="Cadastrar" id="modal-cadastrar-cliente">Cadastrar</button>
+            </div>
+         </div>
+      </div>
+      <div class="col-md-6 mb-3">
+         <div class="card shadow mb-4">
+            <div class="card-header py-3">
+               <h6 class="m-0 font-weight-bold" style="color: #e74a3b;">Interações</h6>
+            </div>
+            <div class="card-body">
+               <div style="display: flex; flex-direction: column; align-items: center;">
+                  <img src="/static/img/undraw_social_interaction_re_dyjh.svg" width="180" height="180">
+                  <p>***Descrição intuitiva para explicar o campo de interações aos representantes</p>
+               </div>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end;">
+               <button class="btn btn-danger" name="Interações" id="botao-modal-interacao">Interações</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div class="row">
+      <div class="col-md-6 mb-3">
+         <div class="card shadow mb-4">
+            <div class="card-header py-3">
+               <h6 class="m-0 font-weight-bold" style="color: #1cc88a;">Pedidos de Clientes</h6>
+            </div>
+            <div class="card-body">
+               <div class="table-responsive">
+                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                      <thead>
+                          <tr>
+                              <th>Name</th>
+                              <th>Position</th>
+                              <th>Office</th>
+                              <th>Age</th>
+                              <th>Start date</th>
+                              <th>Salary</th>
+                          </tr>
+                      </thead>
+                      <tfoot>
+                          <tr>
+                              <th>Name</th>
+                              <th>Position</th>
+                              <th>Office</th>
+                              <th>Age</th>
+                              <th>Start date</th>
+                              <th>Salary</th>
+                          </tr>
+                      </tfoot>
+                      <tbody>
+                          <tr>
+                              <td>Tiger Nixon</td>
+                              <td>System Architect</td>
+                              <td>Edinburgh</td>
+                              <td>61</td>
+                              <td>2011/04/25</td>
+                              <td>$320,800</td>
+                          </tr>
+                          <tr>
+                              <td>Garrett Winters</td>
+                              <td>Accountant</td>
+                              <td>Tokyo</td>
+                              <td>63</td>
+                              <td>2011/07/25</td>
+                              <td>$170,750</td>
+                          </tr>
+                          <tr>
+                              <td>Ashton Cox</td>
+                              <td>Junior Technical Author</td>
+                              <td>San Francisco</td>
+                              <td>66</td>
+                              <td>2009/01/12</td>
+                              <td>$86,000</td>
+                          </tr>
+                          <tr>
+                              <td>Cedric Kelly</td>
+                              <td>Senior Javascript Developer</td>
+                              <td>Edinburgh</td>
+                              <td>22</td>
+                              <td>2012/03/29</td>
+                              <td>$433,060</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              ***Descrição intuitiva para explicar o campo de <code>pedidos</code> aos representantes</p>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end; align-items: center;">
+               <button class="btn btn-success" name="pedidos" id="pedidos-ganhos">Exibir Pedidos</button>
+            </div>
+         </div>
+      </div>
+      <div class="col-md-6 mb-3">
+         <div class="card shadow mb-4">
+            <div class="card-header py-3">
+               <h6 class="m-0 font-weight-bold text-secondary">Pedidos em andamento</h6>
+            </div>
+            <div class="card-body">
+               <div class="table-responsive">
+                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                      <thead>
+                          <tr>
+                              <th>Name</th>
+                              <th>Position</th>
+                              <th>Office</th>
+                              <th>Age</th>
+                              <th>Start date</th>
+                              <th>Salary</th>
+                          </tr>
+                      </thead>
+                      <tfoot>
+                          <tr>
+                              <th>Name</th>
+                              <th>Position</th>
+                              <th>Office</th>
+                              <th>Age</th>
+                              <th>Start date</th>
+                              <th>Salary</th>
+                          </tr>
+                      </tfoot>
+                      <tbody>
+                          <tr>
+                              <td>Tiger Nixon</td>
+                              <td>System Architect</td>
+                              <td>Edinburgh</td>
+                              <td>61</td>
+                              <td>2011/04/25</td>
+                              <td>$320,800</td>
+                          </tr>
+                          <tr>
+                              <td>Garrett Winters</td>
+                              <td>Accountant</td>
+                              <td>Tokyo</td>
+                              <td>63</td>
+                              <td>2011/07/25</td>
+                              <td>$170,750</td>
+                          </tr>
+                          <tr>
+                              <td>Ashton Cox</td>
+                              <td>Junior Technical Author</td>
+                              <td>San Francisco</td>
+                              <td>66</td>
+                              <td>2009/01/12</td>
+                              <td>$86,000</td>
+                          </tr>
+                          <tr>
+                              <td>Cedric Kelly</td>
+                              <td>Senior Javascript Developer</td>
+                              <td>Edinburgh</td>
+                              <td>22</td>
+                              <td>2012/03/29</td>
+                              <td>$433,060</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              ***Descrição intuitiva para explicar o campo de <code>pedidos em andamento</code> aos representantes</p>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end;">
+               <button class="btn btn-secondary" name="pedidos" id="pedidos-ganhos">Em andamento</button>
+            </div>
+         </div>
       </div>
    </div>
 </div>
 
 <div class="container pt-4" style="transition: 0.5s; max-width: 1440px;">
-   <div class="row">
+   <!-- <div class="row">
       <div class="col-md-6 mb-3">
 
          <div class="input-group" style="width: 65%;">
@@ -28,16 +240,16 @@
 
          </div>
       </div>
-   </div>
+   </div> -->
    <div class="row" id="cardInicio">
 
    </div>
 
-   <div class="row">
+   <!-- <div class="row">
       <div class="col-md-6 mb-3">
          <button class="btn btn-info" id="carregarItens" style="width: 200px; font-size: 12px;">Carregar Itens (Funil de Vendas)</button>
       </div>
-   </div>
+   </div> -->
 
       <div class="modal fade" id="modalPerder" data-bs-backdrop="static" tabindex="-1" role="dialog"
          aria-labelledby="modalPerderLabel">
@@ -121,9 +333,21 @@
    <div id="loading-spinner"></div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+
 <script src="/static/js/buscando_api.js"></script>
 <script src="/static/js/envios.js"></script>
 <script src="/static/js/modal.js"></script>
+<script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Plugin icons -->
+<script src="https://kit.fontawesome.com/d1807a784c.js" crossorigin="anonymous"></script>
+
+<!-- script com a construção das tabelas -->
+<script src="static/js/demo/datatables-demo.js"></script>
 
 <script>
    function botaoAdicionarContato(){

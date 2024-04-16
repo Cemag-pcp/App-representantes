@@ -1,5 +1,5 @@
-{% extends "layout.html" %}
-{% block body %}
+{% extends "base.html" %}
+{% block container %}
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -290,6 +290,18 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+
+<script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Plugin icons -->
+<script src="https://kit.fontawesome.com/d1807a784c.js" crossorigin="anonymous"></script>
+
+<!-- script com a construção das tabelas -->
+<script src="static/js/demo/datatables-demo.js"></script>
 
 <script>
   // Manipulador de evento de clique para botões favoritos

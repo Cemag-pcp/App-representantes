@@ -1,5 +1,5 @@
-{% extends "layout.html" %}
-{% block body %}
+{% extends "base.html" %}
+{% block container %}
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -296,6 +296,10 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
 
 <script>
   // Manipulador de evento de clique para botões favoritos
