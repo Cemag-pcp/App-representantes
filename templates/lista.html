@@ -1,0 +1,1597 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-success alert-dismissible fade show" id="alerta_Os" role="alert">
+  {{ message }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">×</span>
+  </button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<section class="container table__header">
+  <h2>Gerar proposta</h2>
+</section>
+
+<div style="display: none;">
+  <input type="hidden" id="representante-name" value="{{ representante }}">
+</div>
+
+<!-- INFORMAÇÕES DO CLIENTE -->
+
+<div class="container filter-wrapper2">
+  <div class="filtrar_preco">
+  <div>
+    <label for="filtro-nome-novo">Nome:</label>
+    <input type="text" id="filtro-nome-novo" class="form-control" style="width: 150px;">
+    <select id="resultado-nomes-novo" class="form-control" data-live-search="true" style="width: 150px;"
+      onchange="atualizarCliente()">
+      <option value="">Selecione</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="filtro-contatos-novo">Contatos:</label>
+    <select id="resultado-contatos-novo" class="form-control" data-live-search="true" style="width: 150px;">
+      <option value="">Selecione</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="forma-pagamento">Pagamento:</label>
+    <select id="forma-pagamento" class="form-control" style="width: 150px;">
+      <option></option>
+    </select>
+  </div>
+
+  <div id="responsaveis">
+    <label for="filtro-responsavel">Responsável:</label>
+    <select id="resultado-responsavel" class="form-control" data-live-search="true" style="width: 150px;">
+      <option value="">Selecione</option>
+    </select>
+  </div>
+
+  <div>
+    <button id="filtrar" onclick="atualizar_regiao()">Filtrar Preço</button>
+  </div>
+
+</div>
+</div>
+<!-- FILTROS -->
+
+<div class="container filter-wrapper hidden">
+  <div class="hidden">
+    <label for="filtro-descricao">Categoria:</label>
+    <select id="filtro-descricao" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for descricao in descricao_unique %}
+      <option>{{descricao[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-modelo">Modelo:</label>
+    <select id="filtro-modelo" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for modelo in modelo_unique %}
+      <option>{{modelo[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-eixo">Eixo:</label>
+    <select id="filtro-eixo" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for eixo in eixo_unique %}
+      <option>{{eixo[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-molaFreio">Mola/Freio:</label>
+    <select id="filtro-molaFreio" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for mola in mola_freio_unique %}
+      <option>{{mola[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-tamanho">Tamanho:</label>
+    <select id="filtro-tamanho" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for tamanho in tamanho_unique %}
+      <option>{{tamanho[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-rodado">Rodado:</label>
+    <select id="filtro-rodado" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for rodado in rodado_unique %}
+      <option>{{rodado[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-pneu">Pneu:</label>
+    <select id="filtro-pneu" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for pneu in pneu_unique %}
+      <option>{{pneu[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="hidden">
+    <label for="filtro-descricao-generica">Opcionais:</label>
+    <select id="filtro-descricao-generica" onchange="atualizarDados()">
+      <option value="">Selecionar</option>
+      {% for descricao_generica in descricao_generica_unique %}
+      <option>{{descricao_generica[0]}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <button onclick="limparFiltros()" class="limpar_filtros" >Limpar Filtros</button>
+  </div>
+  <div div class="hidden">
+    <label for="filtro-produto-mais-vendido">Produtos mais vendidos:</label>
+    <div class="toggle" id="maquina-parada-toggle">
+      <label class="switch2">
+        <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito" onchange="botaoFavoritos()">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- TABELA -->
+
+<div class="container tabela_consulta hidden">
+  <div class="row" style="transition: 0.5s;">
+    <div class="table-container">
+      <!-- <a href="/export/pdf-all">
+        <i class="fas fa-file-pdf" style="font-size:20px;color:red"></i>
+      </a> -->
+      <table id="table1" class="table table-striped responsive-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Família</th>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Cor</th>
+            <th>Preço</th>
+            <th>Desconto</th>
+            <th>Preço c/ desconto</th>
+            <th>Favorito</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data %}
+          <tr>
+            <td></td>
+            <td data-label="Modelo">{{row[11]}}</td>
+            <td data-label="Código" id='codigo'>{{row[0]}}</td>
+            <td data-label="Descrição" class="descricao-dropdown">{{row[13]}}</td>
+            <td data-label="Cor">
+              <select id="cor" class="cor-dropdown" style="width:160px;">
+                <option value="Laranja" selected>Laranja</option>
+                <option value="Verde">Verde</option>
+                <option value="Vermelha">Vermelha</option>
+                <option value="Azul">Azul</option>
+                <option value="Amarela">Amarela</option>
+              </select>
+            </td>
+
+            <td data-label="Preço" style="white-space: nowrap;">
+              <select id="preco" class="preco-dropdown" style="width:200px;">
+                <option value="{{row[20]}}" selected>{{row[20]}}</option>
+                {% if representante != 'Lucas Gallo' and representante != 'Renato Rodi' %}
+                  {% if row[22] != '' %}:
+                  <option value="{{row[22]}}">Promo: {{row[22]}}</option>
+                  {% else %}
+                  {% endif %}
+                  {% if row[23] != '' %}:
+                  <option value="{{row[23]}}">Promo c/Frete: {{row[23]}}</option>
+                  {% else %}
+                  {% endif %}
+                {% else %}
+                {% endif %}
+              </select>
+            </td>
+            <td data-label="% de Desconto">
+              <input class="row-data desconto-input" id="desconto" name="desconto" placeholder="%" style="width: 115px;"
+                oninput="updatePrice(event);" type="number">
+            </td>
+            <td data-label="Preço Final">
+              <input class="row-data preco-input" id="preco" name="preco" placeholder="Preço c/ desc."
+                style="width: 115px;" oninput="formatPriceInput(event);">
+            </td>
+
+            <td data-label="Favorito">
+              <div class="toggle" id="maquina-parada-toggle">
+                <label class="switch2">
+                  {% if row[24] == 'on' %}:
+                  <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito"
+                    data-row-id="{{row[0]}}" checked>
+                  <span class="slider round"></span>
+                  {% else %}
+                  <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito"
+                    data-row-id="{{row[0]}}">
+                  <span class="slider round"></span>
+                  {% endif %}
+                </label>
+              </div>
+            </td>
+
+            <td data-label="Selecionar">
+              <button class="btn btn-primary btn-sm" onclick="toggleRowColor(this); toggleCardItem(this);"
+                id='botão_enviar_carrinho'><i class="fa-sharp fa-solid fa-paper-plane"></i> Enviar</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING SPINNER -->
+
+<div id="loading-overlay" style="display: none;">
+  <div id="loading-spinner"></div>
+</div>
+
+<!-- LOADING BAR -->
+
+<div id="overlay" style="display: none;">
+  <div id="loading-bar-container">
+    <div id="loading-bar">
+      <div id="loading-progress"></div>
+    </div>
+  </div>
+</div>
+
+<div id="modalEnviar" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span> <!-- Botão de fechar -->
+
+    <div>
+      <label for="observacao">Observações:</label>
+      <textarea id="observacao" rows="4" cols="45"></textarea>
+    </div>
+
+    <button class="enviarModal" id="enviar-button-proposta">Enviar</button>
+  </div>
+</div>
+
+<div class="modal" id="modal_confirmacao_proposta" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tem certeza que deseja enviar os itens abaixo?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="fechar_confirmacao_proposta">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="overflow-y: auto; height: 400px;">
+        <div class="form-group">
+          <label>Descrição da Carreta</label>
+          <ul id="codigo_e_carreta_confirmacao_proposta">
+          </ul>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="botao_nao_proposta">Não</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal" id="botao_sim_proposta">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Manipulador de evento de clique para botões favoritos
+  $('#table1').on('click', '.favorito-btn', function (event) {
+    // Obter o estado do favorito e o ID da linha
+    var favoriteState = this.checked ? 'on' : 'off';
+    var rowId = this.getAttribute('data-row-id');
+
+    // Enviar a solicitação POST ao backend do Python
+    fetch('/favoritos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        favorite: favoriteState,
+        rowId: rowId
+      })
+    })
+      .then(function (response) {
+        // Lidar com a resposta do servidor, se necessário
+      })
+      .catch(function (error) {
+        // Lidar com erros de solicitação, se necessário
+      });
+  });
+</script>
+
+<script>
+  // Inicialize o Select2 no elemento 'mySelect'
+  $(document).ready(function () {
+    $('#resultado-responsavel').select2();
+  });
+</script>
+
+<script>
+  // Selecionar o elemento do botão de fechar
+  var closeButton = document.querySelector(".modal .close");
+
+  // Selecionar o elemento do modal
+  var modal = document.getElementById("modalEnviar");
+
+  // Função para fechar o modal
+  function fecharModal() {
+    modal.style.display = "none";
+  }
+
+  // Configurar evento de clique para fechar o modal quando o botão de fechar for clicado
+  closeButton.addEventListener("click", fecharModal);
+
+</script>
+
+<script>
+  $(document).ready(function () {
+    // Ao clicar no botão "Enviar"
+    $('#btnEnviar').click(function () {
+      // Exibir o modal
+      $('#modalEnviar').show();
+    });
+
+    // Ao clicar no botão "Fechar" do modal
+    $('#modalEnviar').on('click', '.fecharModal', function () {
+      // Esconder o modal
+      $('#modalEnviar').hide();
+    });
+
+    // Esconder o modal após o envio
+    $('#modalEnviar').hide();
+  });
+
+</script>
+
+<script>// Atualizar dados de dropdown e tabela
+  function atualizarDados() {
+    $("#loading-overlay").show();
+    var descricao = $('#filtro-descricao').val();
+    var modelo = $('#filtro-modelo').val();
+    var eixo = $('#filtro-eixo').val();
+    var mola_freio = $('#filtro-molaFreio').val();
+    var tamanho = $('#filtro-tamanho').val();
+    var rodado = $('#filtro-rodado').val();
+    var pneu = $('#filtro-pneu').val();
+    var descricao_generica = $('#filtro-descricao-generica').val();
+    var filtro_nome = $('#resultado-nomes-novo').val();
+
+    // obter os valores selecionados em cada dkropdown
+
+    // enviar a solicitação AJAX para o servidor
+    $.ajax({
+      url: '/atualizar-dados',
+      method: 'POST',
+      data: {
+        descricao: descricao,
+        modelo: modelo,
+        eixo: eixo,
+        mola_freio: mola_freio,
+        tamanho: tamanho,
+        rodado: rodado,
+        pneu: pneu,
+        descricao_generica: descricao_generica,
+        filtro_nome: filtro_nome,
+        // inclua outros dropdowns aqui
+      },
+      success: function (response) {
+        // atualizar o DataFrame com os dados retornados
+        var dadosAtualizados = response.dados;
+        var descricaoAtualizada = response.descricao;
+        var modeloAtualizado = response.modelo;
+        var eixoAtualizado = response.eixo;
+        var molaFreioAtualizado = response.mola_freio;
+        var tamanhoAtualizado = response.tamanho;
+        var rodadoAtualizado = response.rodado;
+        var pneuAtualizado = response.pneu;
+        var descricaoGenericaAtualizado = response.descricao_generica;
+        var filtroNomeAtualizado = response.descricao_generica;
+
+        // faça o processamento necessário para atualizar o DataFrame na página
+
+        // atualizar a tabela com os dados retornados
+        atualizarTabela(dadosAtualizados);
+        atualizarDropdowns(descricaoAtualizada, modeloAtualizado, eixoAtualizado, molaFreioAtualizado, tamanhoAtualizado, rodadoAtualizado, pneuAtualizado, descricaoGenericaAtualizado);
+        $("#loading-overlay").hide(); // Oculta o overlay após atualizar os dados
+
+      },
+      error: function (error) {
+        console.log(error);
+        $("#loading-overlay").hide(); // Oculta o overlay após atualizar os dados
+      }
+    });
+
+  }
+
+  function botaoFavoritos() {
+    $("#loading-overlay").show();
+    var descricao = $('#filtro-descricao').val();
+    var modelo = $('#filtro-modelo').val();
+    var eixo = $('#filtro-eixo').val();
+    var mola_freio = $('#filtro-molaFreio').val();
+    var tamanho = $('#filtro-tamanho').val();
+    var rodado = $('#filtro-rodado').val();
+    var pneu = $('#filtro-pneu').val();
+    var descricao_generica = $('#filtro-descricao-generica').val();
+    var filtro_nome = $('#filtro-nome').val();
+    var lista_preco = $('#filtro-lista').val();
+    var buttonFav = true;
+
+    // obter os valores selecionados em cada dropdown
+
+    // enviar a solicitação AJAX para o servidor
+    $.ajax({
+      url: '/atualizar-dados',
+      method: 'POST',
+      data: {
+        descricao: descricao,
+        modelo: modelo,
+        eixo: eixo,
+        mola_freio: mola_freio,
+        tamanho: tamanho,
+        rodado: rodado,
+        pneu: pneu,
+        descricao_generica: descricao_generica,
+        filtro_nome: filtro_nome,
+        lista_preco: lista_preco,
+        buttonFav: buttonFav
+        // inclua outros dropdowns aqui
+      },
+      success: function (response) {
+        // atualizar o DataFrame com os dados retornados
+        var dadosAtualizados = response.dados;
+        var descricaoAtualizada = response.descricao;
+        var modeloAtualizado = response.modelo;
+        var eixoAtualizado = response.eixo;
+        var molaFreioAtualizado = response.mola_freio;
+        var tamanhoAtualizado = response.tamanho;
+        var rodadoAtualizado = response.rodado;
+        var pneuAtualizado = response.pneu;
+        var descricaoGenericaAtualizado = response.descricao_generica;
+        var filtroNomeAtualizado = response.filtro_nome;
+        var listaAtualizado = response.lista_preco;
+
+        // faça o processamento necessário para atualizar o DataFrame na página
+
+        // atualizar a tabela com os dados retornados
+        atualizarTabela(dadosAtualizados);
+        atualizarDropdowns(descricaoAtualizada, modeloAtualizado, eixoAtualizado, molaFreioAtualizado, tamanhoAtualizado, rodadoAtualizado, pneuAtualizado, descricaoGenericaAtualizado, listaAtualizado);
+        $("#loading-overlay").hide(); // Oculta o overlay após atualizar os dados
+
+      },
+      error: function (error) {
+        console.log(error);
+        $("#loading-overlay").hide(); // Oculta o overlay após atualizar os dados
+      }
+    });
+
+  }
+
+
+  function atualizarTabela(dados) {
+    $("#loading-overlay").show();
+    var tabela = $('#table1 tbody');
+    var representante = $('#representante-name').val();
+    tabela.empty(); // limpar a tabela antes de adicionar os novos dados
+    
+    console.log(representante)
+
+    dados.forEach(function (row) {
+
+      var variavel1 = `${row[24]}`;
+
+      var favoritoCheckbox = '';
+      if (variavel1 === 'on') {
+        favoritoCheckbox = `
+              <input class=s"btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito" data-row-id="${row[0]}" checked> 
+              <span class="slider round"></span>
+            `;
+      } else {
+        favoritoCheckbox = ` 
+              <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito" data-row-id="${row[0]}"> 
+              <span class="slider round"></span>
+            `;
+      }
+
+      console.log(variavel1);
+
+      var html = `
+          <tr>
+            <td></td>
+            <td data-label="Modelo">${row[11]}</td>
+            <td data-label="Código" id="codigo">${row[0]}</td>
+            <td data-label="Descrição" class="descricao-dropdown">${row[13]}</td>
+            <td data-label="Cor">
+              <select id="cor" class="cor-dropdown" style="width:160px;">
+                <option value="Laranja" selected>Laranja</option>
+                <option value="Verde">Verde</option>
+                <option value="Vermelha">Vermelha</option>
+                <option value="Azul">Azul</option>
+                <option value="Amarela">Amarela</option>
+              </select>
+            </td>
+            <td data-label="Preço" style="white-space: nowrap;">
+              <select id="preco" class="preco-dropdown" style="width:200px;">
+                <option value="${row[20]}" selected>${row[20]}</option>
+                ${representante != 'Lucas Gallo' && representante != 'Renato Rodi'?`
+                  ${row[22] !== '' ? `
+                  <option value="${row[22]}">Promo: ${row[22]}</option>
+                  ` : ''}
+                  ${row[23] !== '' ? `
+                  <option value="${row[23]}">Promo c/Frete: ${row[23]}</option>
+                  `:''}
+                `:''} 
+              </select>
+            </td>
+            <td data-label="% de Desconto">
+              <input class="row-data desconto-input" id="desconto" name="desconto" placeholder="%" style="width: 115px;" oninput="updatePrice(event);">
+            </td>
+            <td data-label="Preço Final">
+              <input class="row-data preco-input" id="preco" name="preco" placeholder="Preço c/ desc." style="width: 115px;" oninput="formatPriceInput(event);">
+            </td>
+            <td data-label="Favorito">
+              <div class="toggle" id="maquina-parada-toggle">
+                <label class="switch2">
+                  ${favoritoCheckbox}
+                </label>
+              </div>
+            </td>
+            <td data-label="Selecionar">
+              <button class="btn btn-primary btn-sm" onclick="toggleRowColor(this); toggleCardItem(this);" id="botão_enviar_carrinho"><i class="fa-sharp fa-solid fa-paper-plane"></i>   Enviar</button>
+            </td>
+          </tr>`;
+
+      tabela.append(html);
+
+    });
+
+    $("#loading-overlay").hide();
+  }
+
+  function atualizarDropdowns(descricao, modelo, eixo, mola_freio, tamanho, rodado, pneu, descricao_generica) {
+    $("#loading-overlay").show();
+    var descricaoDropdown = $('#filtro-descricao');
+    var modeloDropdown = $('#filtro-modelo');
+    var eixoDropdown = $('#filtro-eixo');
+    var molaFreioDropdown = $('#filtro-molaFreio');
+    var tamanhoDropdown = $('#filtro-tamanho');
+    var rodadoDropdown = $('#filtro-rodado');
+    var pneuDropdown = $('#filtro-pneu');
+    var descricaoGenericaDropdown = $('#filtro-descricao-generica');
+    var filtroSelect = $('#filtro-nome');
+
+    // Armazenar os valores selecionados atualmente
+    var descricaoSelecionada = descricaoDropdown.val();
+    var modeloSelecionado = modeloDropdown.val();
+    var eixoSelecionado = eixoDropdown.val();
+    var molaFreioSelecionado = molaFreioDropdown.val();
+    var tamanhoSelecionado = tamanhoDropdown.val();
+    var rodadoSelecionado = rodadoDropdown.val();
+    var pneuSelecionado = pneuDropdown.val();
+    var descricaoGenericaSelecionado = descricaoGenericaDropdown.val();
+
+    descricaoDropdown.empty();
+    modeloDropdown.empty();
+    eixoDropdown.empty();
+    molaFreioDropdown.empty();
+    tamanhoDropdown.empty();
+    rodadoDropdown.empty();
+    pneuDropdown.empty();
+    descricaoGenericaDropdown.empty();
+
+    // Adicionar a opção "Todos" em todos os dropdowns
+    descricaoDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    modeloDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    eixoDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    molaFreioDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    tamanhoDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    rodadoDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    pneuDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+    descricaoGenericaDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+
+    // Preencher os valores dos dropdowns e selecionar o valor atual, se existir
+    $.each(descricao, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === descricaoSelecionada) {
+        option.attr('selected', 'selected');
+      }
+      descricaoDropdown.append(option);
+    });
+
+    $.each(modelo, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === modeloSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      modeloDropdown.append(option);
+    });
+
+    $.each(eixo, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === eixoSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      eixoDropdown.append(option);
+    });
+
+    $.each(mola_freio, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === molaFreioSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      molaFreioDropdown.append(option);
+    });
+
+    $.each(tamanho, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === tamanhoSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      tamanhoDropdown.append(option);
+    });
+
+    $.each(rodado, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === rodadoSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      rodadoDropdown.append(option);
+    });
+
+    $.each(pneu, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === pneuSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      pneuDropdown.append(option);
+    });
+
+    $.each(descricao_generica, function (index, value) {
+      var option = $('<option>').text(value[0]).attr('value', value[0]);
+      if (value[0] === descricaoGenericaSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      descricaoGenericaDropdown.append(option);
+    });
+
+    $("#loading-overlay").hide();
+    // Atualize os outros dropdowns conforme necessário
+  }
+
+</script>
+
+<script>// Botão para limpar os filtros
+
+  function limparFiltros() {
+    var descricaoGenericaSelect = $('#filtro-descricao');
+    var modeloSelect = $('#filtro-modelo');
+    var eixoSelect = $('#filtro-eixo');
+    var molaFreioSelect = $('#filtro-molaFreio');
+    var tamanhoSelect = $('#filtro-tamanho');
+    var rodadoSelect = $('#filtro-rodado');
+    var pneuSelect = $('#filtro-pneu');
+    var adicionaisSelect = $('#filtro-descricao-generica');
+
+    // Defina o valor "Todos" para cada dropdown
+    descricaoGenericaSelect.val('');
+    modeloSelect.val('');
+    eixoSelect.val('');
+    molaFreioSelect.val('');
+    tamanhoSelect.val('');
+    rodadoSelect.val('');
+    pneuSelect.val('');
+    adicionaisSelect.val('');
+
+    // Dispare o evento "change" para acionar a ação desejada
+    descricaoGenericaSelect.trigger('change');
+    modeloSelect.trigger('change');
+    eixoSelect.trigger('change');
+    molaFreioSelect.trigger('change');
+    tamanhoSelect.trigger('change');
+    rodadoSelect.trigger('change');
+    pneuSelect.trigger('change');
+    adicionaisSelect.trigger('change');
+
+    // Enviar a solicitação AJAX para atualizar os dados
+    $.ajax({
+      url: '/atualizar-dados',
+      method: 'POST',
+      data: {
+        descricao: descricaoGenericaSelect.val(),
+        modelo: modeloSelect.val(),
+        eixo: eixoSelect.val(),
+        mola_freios: molaFreioSelect.val(),
+        tamanho: tamanhoSelect.val(),
+        rodado: rodadoSelect.val(),
+        pneu: pneuSelect.val(),
+        adicionais: adicionaisSelect.val()
+        // inclua outros dropdowns aqui
+      },
+      success: function (response) {
+        // atualizar o DataFrame com os dados retornados
+        var dadosAtualizados = response.dados;
+        var descricaoAtualizada = response.descricao;
+        var modeloAtualizado = response.modelo;
+        var eixoAtualizado = response.eixo;
+        var molaFreioAtualizado = response.mola_freio;
+        var tamanhoAtualizado = response.tamanho;
+        var rodadoAtualizado = response.rodado;
+        var pneuAtualizado = response.pneu;
+        var descricaoGenericaAtualizado = response.adicionais;
+
+        // faça o processamento necessário para atualizar o DataFrame na página
+
+        // atualizar a tabela com os dados retornados
+        atualizarTabela(dadosAtualizados);
+        atualizarDropdowns(descricaoAtualizada, modeloAtualizado, eixoAtualizado, molaFreioAtualizado, tamanhoAtualizado, rodadoAtualizado, pneuAtualizado, descricaoGenericaAtualizado);
+      },
+    });
+  }
+</script>
+
+<script>// Atualizar dados de dropdow de clientes
+  function atualizarCliente() {
+    $("#loading-overlay").show();
+
+    var nome_cliente = $('#resultado-nomes-novo').val();
+    // var contato_cliente = $('#filtro-contato').val();
+    // var condicoes = $('#forma-pagamento').val();
+
+    // obter os valores selecionados em cada dropdown
+
+    // enviar a solicitação AJAX para o servidor
+    $.ajax({
+      url: '/atualizar-cliente',
+      method: 'POST',
+      data: {
+        nome_cliente: nome_cliente,
+        // contato_cliente: contato_cliente,
+        // condicoes: condicoes
+        // inclua outros dropdowns aqui
+      },
+      success: function (response) {
+        // atualizar o DataFrame com os dados retornados
+        // var nomeClienteAtualizado = response.nome_cliente;
+        // var contatoClienteAtualizado = response.contato_cliente;
+        var formaPagamentoAtualizado = response.condicoes;
+
+        // faça o processamento necessário para atualizar o DataFrame na página
+
+        // atualizar a tabela com os dados retornados
+        // atualizarDropdownsCliente(contatoClienteAtualizado,formaPagamentoAtualizado)
+        atualizarDropdownsCliente(formaPagamentoAtualizado)
+        $("#loading-overlay").hide(); // Oculta o overlay após atualizar os dados
+
+      },
+      error: function (error) {
+        console.log(error);
+        $("#loading-overlay").hide(); // Oculta o overlay após atualizar os dados
+      }
+    });
+  }
+
+  function atualizarDropdownsCliente(formaPagamento) {
+
+    $("#loading-overlay").show();
+    var formaPagamentoDropdown = $('#forma-pagamento');
+
+    var formaPagamentoSelecionado = formaPagamentoDropdown.val();
+
+    formaPagamentoDropdown.empty();
+
+    formaPagamentoDropdown.append($('<option>').text('Selecionar').attr('value', ''));
+
+    $.each(formaPagamento, function (index, value) {
+      var option = $('<option>').text(value).attr('value', value);
+      if (value === formaPagamentoSelecionado) {
+        option.attr('selected', 'selected');
+      }
+      formaPagamentoDropdown.append(option);
+    });
+
+    $("#loading-overlay").hide();
+
+  }
+</script>
+
+<script>// Function to format the price input
+
+  function formatPriceInput(event) {
+    const input = event.target;
+    const rawValue = input.value;
+
+    // Remove any non-digit characters from the input value
+    const cleanedValue = rawValue.replace(/[^0-9]/g, '');
+
+    // Format the cleaned value as Brazilian Real
+    const formattedValue = formatAsReal(cleanedValue);
+
+    // Set the formatted value back to the input
+    input.value = formattedValue;
+
+    // Clear the input if the formatted value is "0.00"
+    if (formattedValue === "R$ 0,00") {
+      input.value = '';
+    }
+
+  }
+
+  // Function to format a number as Brazilian Real
+  function formatAsReal(value) {
+    // Convert the value to a number
+    const number = Number(value);
+
+    // Check if the number is valid
+    if (isNaN(number)) {
+      return '';
+    }
+
+    // Split the number into integer and decimal parts
+    const integerPart = Math.floor(number / 100);
+    const decimalPart = number % 100;
+
+    // Format the integer part with thousands separator
+    const formattedIntegerPart = integerPart.toLocaleString('pt-BR');
+
+    // Format the decimal part with two decimal places
+    const formattedDecimalPart = decimalPart.toString().padStart(2, '0');
+
+    // Construct the formatted value as Brazilian Real
+    const formattedValue = `R$ ${formattedIntegerPart},${formattedDecimalPart}`;
+
+    return formattedValue;
+  }
+
+</script>
+
+<script>
+  // Função para enviar os dados para o backend usando fetch
+  function sendData(items, nome, contato, formaPagamento, observacoes, nomeResponsavel) {
+    // Crie um objeto com os dados do formulário
+    var formData = {
+      items: items,
+      nome: nome,
+      contato: contato,
+      formaPagamento: formaPagamento,
+      observacoes: observacoes,
+      nomeResponsavel: nomeResponsavel
+    };
+
+    // Faça uma requisição POST para o backend usando fetch
+
+    fetch('/receber-dados', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(response => {
+        if (response.ok) {
+          // Recarrega a página após um breve intervalo de tempo
+          location.reload();
+        } else {
+          console.error('Ocorreu um erro ao enviar os itens.');
+        }
+      })
+      .catch(error => {
+        console.error('Ocorreu um erro ao enviar os itens:', error);
+      });
+  }
+
+  // Função para copiar os itens e o total para a área de transferência
+  function copiarItensETotalParaAreaDeTransferencia() {
+    // Obtenha todos os itens da lista
+    const listItems = document.querySelectorAll('.listCard li');
+
+    // Construa uma string com o conteúdo dos itens
+    let itensTexto = '';
+    listItems.forEach(listItem => {
+      const descricao = listItem.getAttribute('data-description');
+      const corElement = listItem.querySelector('.cor');
+      const cor = corElement.value;
+      const nomeCarreta = listItem.querySelector('.nomeCarreta').textContent;
+      const preco = listItem.querySelector('.quanti').textContent;
+      const quantidade = listItem.querySelector('.numeros').textContent;
+      const descricaoCarreta = listItem.querySelector('.descCarreta').textContent;
+
+      // Construa a string para cada item
+      itensTexto += `${nomeCarreta} - ${descricaoCarreta}\nCor: ${cor}\nPreço: ${preco}\nQuantidade: ${quantidade}\n\n`;
+    });
+
+    // Obtenha o valor do elemento HTML que contém o total
+    const total = document.querySelector('.total').textContent;
+
+    // Adicione o total à string de itens
+    itensTexto += `Total: ${total}\n`;
+
+    // Crie um elemento de área de transferência temporário para copiar o texto
+    const tempInput = document.createElement('textarea');
+    tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
+    tempInput.value = itensTexto;
+    document.body.appendChild(tempInput);
+
+    // Seleciona o texto dentro do elemento de área de transferência
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999); // Para dispositivos móveis
+
+    // Executa o comando de cópia para copiar o texto selecionado
+    document.execCommand('copy');
+
+    // Remove o elemento de área de transferência temporário
+    document.body.removeChild(tempInput);
+
+    alert('Itens copiados para a área de transferência!\n');
+
+  }
+  
+  // Função para lidar com o clique no botão "Enviar"
+  function handleEnviarButtonClick() {
+    // Exibe o carregamento
+    $("#loading-overlay").show();
+
+    let items = obterDadosProposta()
+
+    // Obtenha os valores dos campos adicionais do formulário
+    var nome = document.getElementById('resultado-nomes-novo').value;
+    var contato = document.getElementById('resultado-contatos-novo').value;
+    var formaPagamento = document.getElementById('forma-pagamento').value;
+    var observacoes = document.getElementById('observacao').value;
+    var nomeResponsavel = document.getElementById('resultado-responsavel').value;
+
+    // Chame a função para enviar os dados para o backend usando fetch
+    sendData(items, nome, contato, formaPagamento, observacoes, nomeResponsavel);
+    copiarItensETotalParaAreaDeTransferencia();
+  }
+
+  $('#botao_sim_proposta').one('click',function(){
+    handleEnviarButtonClick()
+  })
+
+  function obterDadosProposta(){
+    // Exibe o carregamento
+    const items = [];
+
+    // Obtenha todos os itens da lista
+    const listItems = document.querySelectorAll('.listCard li');
+
+    // Percorra os itens e obtenha os dados
+    listItems.forEach(listItem => {
+      const description = listItem.getAttribute('data-description');
+      const corElement = listItem.querySelector('.cor');
+      const cor = corElement.value;
+      const quantiElement = listItem.querySelector('.quanti');
+      const quanti = quantiElement.textContent;
+      const numerosElement = listItem.querySelector('.numeros');
+      const numeros = numerosElement.textContent;
+      let quanti_tratado = parseFloat(quanti.replace("R$ ", "").replace(".", ""));
+      let numeros_tratado = parseFloat(numeros);
+      console.log(quanti_tratado,numeros_tratado)
+      const valorReal = parseFloat(quanti_tratado * numeros_tratado);
+      // const valorRealElement = listItem.querySelector('.valorReal');
+      // const valorReal = valorRealElement.textContent;
+      const descricaoCarreta = listItem.querySelector('.descCarreta');
+      const descCarreta = descricaoCarreta.textContent;
+
+      // Crie um objeto com os dados do item
+      const item = {
+        description: description,
+        cor: cor,
+        quanti: quanti,
+        numeros: numeros,
+        valorReal: valorReal,
+        descCarreta:descCarreta
+      };
+
+      // Adicione o item à lista de itens
+      items.push(item);
+    });
+
+    return items
+  }
+
+  // Adicione um evento de clique ao botão "Enviar"
+  $('#enviar-button-proposta').on('click',function(){
+    modalConfirmacaoProposta();
+  })
+  
+  function fecharModalConfirmacaoProposta() {
+
+    $('#modal_confirmacao_proposta').hide();
+    
+  }
+
+  function modalConfirmacaoProposta() {
+
+      $('#modal_confirmacao_proposta .modal-body ul').empty();
+
+      $('#modal_confirmacao_proposta').show();
+
+      let itens_modal_proposta = obterDadosProposta()
+
+      var nome = document.getElementById('resultado-nomes-novo').value;
+      var contato = document.getElementById('resultado-contatos-novo').value;
+      var formaPagamento = document.getElementById('forma-pagamento').value;
+      var observacoes = document.getElementById('observacao').value;
+      var nomeResponsavel = document.getElementById('resultado-responsavel').value;
+
+      // Crie um elemento para armazenar as informações adicionais
+      var infoAdicionais = document.createElement("div");
+
+      // Adicione o nome
+      var nomeElemento = document.createElement("p");
+      nomeElemento.textContent = "Nome: " + nome;
+      infoAdicionais.appendChild(nomeElemento);
+
+      // Adicione o contato
+      var contatoElemento = document.createElement("p");
+      contatoElemento.textContent = "Contato: " + contato;
+      infoAdicionais.appendChild(contatoElemento);
+
+      // Adicione a forma de pagamento
+      var formaPagamentoElemento = document.createElement("p");
+      formaPagamentoElemento.textContent = "Forma de Pagamento: " + formaPagamento;
+      infoAdicionais.appendChild(formaPagamentoElemento);
+
+      // Adicione as observações
+      var observacoesElemento = document.createElement("p");
+      observacoesElemento.textContent = "Observações: " + observacoes;
+      infoAdicionais.appendChild(observacoesElemento);
+
+      var codigoList_carretaList = document.getElementById("codigo_e_carreta_confirmacao_proposta");
+
+      codigoList_carretaList.appendChild(infoAdicionais);
+
+      // Iterate through the array and add values to the respective ul elements
+      itens_modal_proposta.forEach(function (item) {
+        // Add 'description' to <li> in codigo_confirmacao
+        var codigoItem_carretaItem = document.createElement("li");
+        codigoItem_carretaItem.textContent = item.description+ " - " + item.descCarreta + "; Quantidade: " + item.numeros + " - " + item.cor;
+        codigoList_carretaList.appendChild(codigoItem_carretaItem);
+      });
+  }
+    // Configurar evento de clique para fechar o modal quando o botão de fechar for clicado
+    $('#botao_nao_proposta').on('click',function(){
+      fecharModalConfirmacaoProposta();
+    })
+    
+    $('#fechar_confirmacao_proposta').on('click',function(){
+      fecharModalConfirmacaoProposta();
+    })
+
+</script>
+
+<script>// Atualizar dados de dropdow de clientes
+
+  function atualizar_regiao() {
+
+    var nomeCliente = $('#resultado-nomes-novo').val();
+    var contatosCliente = $('#resultado-contatos-novo').val();
+    var formaPagamento = $('#forma-pagamento').val();
+
+    simulateCodigoReal();
+
+    // Enviar a solicitação AJAX para o servidor
+    $.ajax({
+      url: '/filtrar_regiao',
+      method: 'POST',
+      data: {
+        nome_cliente_regiao: nomeCliente,
+        contatos_cliente_regiao: contatosCliente,
+        forma_pagamento_regiao: formaPagamento
+      },
+      success: function (response) {
+        // atualizar o DataFrame com os dados retornados
+        var nomeClienteAtualizado = response.nomeCliente;
+
+        const filtroNome = document.getElementById('resultado-nomes-novo').value;
+        const filtroContato = document.getElementById('resultado-contatos-novo').value;
+        const formaPagamento = document.getElementById('forma-pagamento').value;
+
+        // Verifica se algum dos campos está vazio
+        if (filtroNome === '' || formaPagamento === '') {
+          hideProgressBar();
+          return;
+        }
+
+        // Se todos os campos estiverem preenchidos, mostra os filtros e o botão de limpar
+        const filtros = document.querySelectorAll('.hidden');
+        const botaoFiltrar = document.getElementById('filtrar');
+
+        if (filtros.length > 0) {
+          filtros.forEach((filtro) => {
+            filtro.classList.remove('hidden');
+          });
+        }
+        hideProgressBar();
+      },
+      error: function (error) {
+        console.log(error);
+        hideProgressBar();
+      }
+    });
+  }
+</script>
+
+<script>
+  // Função para mostrar a barra de progresso
+  function showProgressBar() {
+    $("#overlay").show();
+  }
+
+  // Função para esconder a barra de progresso
+  function hideProgressBar() {
+    $("#overlay").hide();
+  }
+
+  // Função para atualizar a barra de progresso
+  function updateProgressBar(progress) {
+    var loadingProgress = document.getElementById("loading-progress");
+    loadingProgress.style.width = progress + "%";
+  }
+
+  // Função para simular código em execução
+  function simulateCodigoReal() {
+    showProgressBar(); // Mostrar a barra de progresso
+    var totalProgressSteps = 100; // Número total de etapas de progresso
+    var currentProgress = 0; // Progresso atual
+
+    var interval = setInterval(function () {
+      if (currentProgress >= totalProgressSteps) {
+        clearInterval(interval); // Interromper a simulação quando o progresso atingir 100%
+        hideProgressBar(); // Esconder a barra de progresso quando a operação for concluída
+      } else {
+        // Atualizar a barra de progresso a cada iteração
+        currentProgress++;
+        updateProgressBar((currentProgress / totalProgressSteps) * 100);
+      }
+    }, 100); // Tempo de espera entre cada iteração
+  }
+</script>
+
+<script>
+
+  function buscarRepresentanteId(representanteNameValue, skip) {
+
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    var apiUrl = `https://public-api2.ploomes.com/Users?$top=100&$select=Id&$filter=Name eq '${representanteNameValue}'&$skip=${skip}`;
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.value && data.value.length > 0) {
+          return data.value[0].Id; // Pega o primeiro ID da lista (se houver)
+        }
+        return null; // Retorna null se nenhum ID for encontrado
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
+  function buscarContatos(inputValue, ownerId, skip) {
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    var filter = `TypeId eq 1 and OwnerId eq ${ownerId}`;
+
+    if (inputValue.length > 0) {
+      filter += ` and contains(Name,'${inputValue}')`;
+    }
+
+    var apiUrl = `https://public-api2.ploomes.com/Contacts?$top=100&$select=Name&$filter=${filter}&$skip=${skip}`;
+
+    console.log(apiUrl)
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => data.value)
+      .catch(error => {
+        console.error(error);
+        return [];
+      });
+  }
+
+  function buscarProfileId(representanteNameValue, skip) {
+
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    var apiUrl = `https://public-api2.ploomes.com/Users?$top=100&$select=ProfileId&$filter=Name eq '${representanteNameValue}'&$skip=${skip}`;
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.value && data.value.length > 0) {
+          return data.value[0].ProfileId; // Pega o primeiro ID da lista (se houver)
+        }
+        return null; // Retorna null se nenhum ID for encontrado
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
+  function buscarContatosGeral(inputValue, ownerId, skip) {
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    var apiUrl = `https://public-api2.ploomes.com/Contacts?$top=100&$select=Name&$filter=contains(Name,'${inputValue}')&$skip=${skip}`;
+
+    console.log(apiUrl)
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => data.value)
+      .catch(error => {
+        console.error(error);
+        return [];
+      });
+  }
+
+  function buscarReponsaveis(skip) {
+
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    var apiUrl = `https://public-api2.ploomes.com/Users?$select=Name&$filter=Suspended+eq+false`;
+
+    console.log(apiUrl)
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => data.value)
+      .catch(error => {
+        console.error(error);
+        return [];
+      });
+
+  }
+
+  var filtroNomeInput = document.getElementById("filtro-nome-novo");
+  var resultadoNomesSelect = document.getElementById("resultado-nomes-novo");
+  var timer;
+  var skip = 0;
+
+  var representanteNameElement = document.getElementById("representante-name");
+  var representanteNameValue = representanteNameElement.value;
+
+  filtroNomeInput.addEventListener("input", function () {
+    var inputValue = this.value;
+    var divElement = document.getElementById("filtro-responsavel-div");
+
+    // Limpar o dropdown de resultados
+    resultadoNomesSelect.innerHTML = "<option value='' selected>Carregando...</option>";
+
+    // Cancelar a requisição anterior se houver uma
+    clearTimeout(timer);
+
+    // Aguardar 300ms antes de atualizar os resultados
+    timer = setTimeout(function () {
+      // Obtém o valor atualizado do campo de representante
+      var representanteNameValue = representanteNameElement.value;
+
+      buscarProfileId(representanteNameValue, skip)
+        .then(profileId => {
+          if (profileId === 1) {
+
+            buscarContatosGeral(inputValue, profileId, skip)
+              .then(contatos => {
+                resultadoNomesSelect.innerHTML = "<option value='' selected>Selecione</option>";
+                contatos.forEach(contato => {
+                  resultadoNomesSelect.innerHTML += `<option value="${contato.Name}">${contato.Name}</option>`;
+                });
+              });
+
+          } else {
+
+            // Caso contrário, use buscarRepresentanteId e buscarContatos
+            buscarRepresentanteId(representanteNameValue, skip)
+              .then(id => {
+                if (id !== null) {
+                  buscarContatos(inputValue, id, skip)
+                    .then(contatos => {
+                      resultadoNomesSelect.innerHTML = "<option value='' selected>Selecione</option>";
+                      contatos.forEach(contato => {
+                        resultadoNomesSelect.innerHTML += `<option value="${contato.Name}">${contato.Name}</option>`;
+                      });
+                    });
+                } else {
+                  console.log('Nenhum ID de representante encontrado.');
+                }
+              });
+          }
+        });
+    }, 300);
+  });
+
+</script>
+
+<script>
+  // Função para buscar o Id da companhia
+  function buscarCompanyId(clienteName) {
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    var apiUrl = `https://public-api2.ploomes.com/Contacts?$top=100&$select=Id&$filter=Name eq '${encodeURIComponent(clienteName)}'`;
+
+    console.log(apiUrl)
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.value && data.value.length > 0) {
+          console.log(data)
+          return data.value[0].Id; // Pega o Id da companhia
+
+        }
+        return null; // Retorna null se nenhum Id for encontrado
+      })
+      .catch(error => {
+        console.error(error);
+        return null;
+      });
+  }
+
+  // Função para buscar os nomes de contatos da companhia com base no Id
+  function buscarNomeContatos(clienteId) {
+    var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+    // var apiUrl = `https://public-api2.ploomes.com/Contacts?$top=100&$select=Name&$filter=CompanyId eq ${clienteId}`;
+    var apiUrl = `https://public-api2.ploomes.com/Contacts?$expand=Company($select=Id,Name),Owner($expand=Profile),Phones&$skip=0&$top=20&$filter=TypeId+eq+2+and+(CompanyId+eq+${clienteId}+or+Companies/any(c:+c/CompanyId+eq+${clienteId}))&$select=Id,Name,TypeId,CurrencyId,Register,CPF,CNPJ,Owner&$orderby=Name&$count=true`
+
+    return fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'User-Key': apiKey
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // Imprime o objeto de dados no console
+        return data.value; // Retorna o array de contatos
+      })
+      .catch(error => {
+        console.error(error);
+        return [];
+      });
+  }
+
+  // Event listener para o campo de filtro de nome
+  var filtroNomeInput = document.getElementById("resultado-nomes-novo");
+  var resultadoContatosSelect = document.getElementById("resultado-contatos-novo");
+
+  filtroNomeInput.addEventListener("input", function () {
+    var clienteNome = this.value;
+
+    console.log(clienteNome)
+
+    // Limpar o dropdown de resultados de contatos
+    resultadoContatosSelect.innerHTML = "<option value='' selected>Carregando...</option>";
+
+    // Consultar API para buscar o cliente
+    buscarCompanyId(clienteNome)
+      .then(cliente => {
+        if (cliente !== null) {
+          // Consultar API para buscar os contatos do cliente
+          buscarNomeContatos(cliente)
+            .then(contatos => {
+              resultadoContatosSelect.innerHTML = "<option value='' selected>Selecione</option>";
+              contatos.forEach(contato => {
+                resultadoContatosSelect.innerHTML += `<option value="${contato.Name}">${contato.Name}</option>`;
+              });
+            });
+        } else {
+          // Cliente não encontrado
+          console.log('Cliente não encontrado.');
+          resultadoContatosSelect.innerHTML = "<option value='' selected>Nenhum contato encontrado</option>";
+        }
+      });
+  });
+</script>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var representanteNameElement = document.getElementById("representante-name");
+    var representanteNameValue = representanteNameElement.value;
+    var skip = 0;
+
+    var responsaveisLista = document.getElementById("resultado-responsavel");
+
+    function buscarProfileId(representanteNameValue, skip) {
+
+      var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+      var apiUrl = `https://public-api2.ploomes.com/Users?$top=100&$select=ProfileId&$filter=Name eq '${representanteNameValue}'&$skip=${skip}`;
+
+      return fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'User-Key': apiKey
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.value && data.value.length > 0) {
+            return data.value[0].ProfileId; // Pega o primeiro ID da lista (se houver)
+          }
+          return null; // Retorna null se nenhum ID for encontrado
+        })
+        .catch(error => {
+          console.error(error);
+          return null;
+        });
+    }
+
+    function buscarResponsaveis() {
+      var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
+      var apiUrl = `https://public-api2.ploomes.com/Users?$select=Name&$filter=Suspended+eq+false`;
+
+      console.log(apiUrl)
+
+      return fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'User-Key': apiKey
+        }
+      })
+        .then(response => response.json())
+        .then(data => data.value)
+        .catch(error => {
+          console.error(error);
+          return [];
+        });
+    }
+
+    buscarProfileId(representanteNameValue, skip)
+      .then(profileId => {
+        var responsavelElement = document.getElementById("responsaveis");
+        // var selectResponsavelElement = document.getElementById("resultado-responsavel");
+
+        if (profileId === 1) {
+          // Mostrar o elemento de responsável
+          responsavelElement.style.display = "block";
+
+          buscarResponsaveis()
+            .then(contatos => {
+              responsaveisLista.innerHTML = "<option value='' selected>Selecione</option>";
+              contatos.forEach(contato => {
+                responsaveisLista.innerHTML += `<option value="${contato.Name}">${contato.Name}</option>`;
+              });
+
+            });
+        } else {
+          // Ocultar o elemento de responsável
+          responsavelElement.style.display = "none";
+        }
+      });
+  });
+</script>
+
+<script>
+  $(document).ready(function () {
+    // Manipulador de clique para o botão de atualização de cache
+    $("#atualizar-cache").click(function () {
+      $.post("/atualizar-cache", function (data) {
+        // Exibe a mensagem de sucesso na div de mensagem
+        $("#mensagem").text(data.message);
+      });
+    });
+  });
+</script>
+
+<!-- FUNÇÃO PARA GERAR VALOR COM DESCONTO -->
+
+<script>
+  // Encontre o elemento da coluna de preço original
+  const precoOriginalElement = document.querySelector('[data-label="Preço"]');
+
+  // Obtenha o texto do elemento da coluna de preço original
+  const precoOriginalTexto = precoOriginalElement.textContent;
+
+  // Remova caracteres não numéricos e substitua vírgulas por pontos
+  const precoOriginalNumerico = parseFloat(precoOriginalTexto.replace(/[^\d,]/g, '').replace(',', '.'));
+
+  // Formate o preço original para exibição
+  const precoOriginalFormatado = precoOriginalNumerico.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+    // Função para atualizar o preço com desconto
+    function updatePrice(event) {
+      const descontoInput = event.target;
+      const row = descontoInput.closest('tr'); // Encontre a linha atual
+      const precoOriginalElement = row.querySelector('.preco-dropdown');
+      const precoInput = row.querySelector('.preco-input');
+
+      const precoOriginalTexto = precoOriginalElement.value;
+      const precoOriginalNumerico = parseFloat(precoOriginalTexto.replace(/[^\d,]/g, '').replace(',', '.'));
+      
+      const desconto = parseFloat(descontoInput.value);
+      
+      if (!isNaN(desconto)) {
+        const precoComDesconto = precoOriginalNumerico * (1 - desconto / 100);
+        
+        const precoComDescontoFormatado = precoComDesconto.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        
+        precoInput.value = precoComDescontoFormatado;
+        precoInput.disabled = true;
+      } else {
+        precoInput.disabled = false;
+      }
+    }
+</script>
+
+<!-- LIMPAR FILTROS -->
+
+<script>
+  function limparFiltros() {
+    // Obtenha todos os elementos de select dentro do container de filtro
+    const selects = document.querySelectorAll('.filter-wrapper select');
+
+    // Itere sobre os selects e defina o valor padrão (vazio) para cada um
+    selects.forEach(select => {
+      select.value = '';
+    });
+
+    // Chame a função para atualizar os dados (você já tem isso definido em onchange)
+    atualizarDados();
+  }
+</script>
+
+
+{% endblock %}

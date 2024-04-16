@@ -1,0 +1,748 @@
+{% extends 'base.html' %}
+
+{% block links %}
+    <!-- CSS datatable -->
+    <link href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="static/img/bar-progress.css">
+    <!-- CSS dropdown inputs -->
+    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dropdown.css') }}"> -->
+
+{% endblock %}
+
+{% block container %}
+    <!-- Page Heading -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h4 mb-0 text-gray-800">Calibração</h1>
+        <button class="btn btn-info" style="font-size: 12px;" onclick="modalTag()">Cadastro de Tag's   <i class="fa-solid fa-tag"></i> </button>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- tabela gerar cambão -->
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" onclick="changeTab('calibracao')" style="cursor: pointer; font-size: 14px; width: 150px;">Em Calibração</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="changeTab('ACalibrar')" style="cursor: pointer; font-size: 14px; width: 150px;">A Calibrar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="changeTab('Calibrado')" style="cursor: pointer; font-size: 14px; width: 150px;">Calibrados</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Card Body -->
+                <div class="card-body" id="calibracaoTable" style="display: block;">
+                    <div class="table-responsive" style="max-height: 100%; overflow-y: auto;">
+                        <table class="table table-bordered" id="dataTableCalibracao" width="100%" cellspacing="0" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th>Tag Equipamento</th>
+                                    <th>Equipamento</th>
+                                    <th>Responsável</th>
+                                    <th>Localização</th>
+                                    <th>Envio para Calibração</th>
+                                    <th>Opções</th>
+                                    <th style="display: none;">Unidade</th>
+                                    <th style="display: none;">tipoControle</th>
+                                    <th style="display: none;">periodicidade</th>
+                                    <th style="display: none;">metodo</th>
+                                    <th style="display: none;">faixaNominal</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Tag Equipamento</th>
+                                    <th>Equipamento</th>
+                                    <th>Responsável</th>
+                                    <th>Localização</th>
+                                    <th>Envio para Calibração</th>
+                                    <th>Opções</th>
+                                    <th style="display: none;">Unidade</th>
+                                    <th style="display: none;">tipoControle</th>
+                                    <th style="display: none;">periodicidade</th>
+                                    <th style="display: none;">metodo</th>
+                                    <th style="display: none;">faixaNominal</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for list_em_calibracao in list_query_em_calibracao %}
+                                <tr>
+                                    <td>{{list_em_calibracao[0]}}</td>
+                                    <td>{{list_em_calibracao[1]}}</td>
+                                    <td>{{list_em_calibracao[4]}}</td>
+                                    <td>{{list_em_calibracao[3]}}</td>
+                                    <td>{{list_em_calibracao[13]}}</td>
+                                    <td class="p-0" style="align-items: center;">
+                                        <div class="col-sm-4 d-flex justify-content-center align-items-center">
+                                            <a data-toggle="dropdown" style="cursor: pointer; padding: 10px;">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </a>
+                                            <!-- </button> -->
+                                            <div class="dropdown-menu" x-placement="bottom-start">
+                                                <a id="btn_exec" class="dropdown-item" style="cursor: pointer;" onclick="modalRecebimento(this)"> 
+                                                    Recebimento
+                                                </a>
+                                                <a class= "dropdown-item" style="cursor: pointer;" class="btn" onclick="modalExcluir('{{list_em_calibracao[0]}}')"> 
+                                                    Excluir 
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="display: none;">{{list_em_calibracao[2]}}</td>
+                                    <td style="display: none;">{{list_em_calibracao[5]}}</td>
+                                    <td style="display: none;">{{list_em_calibracao[7]}}</td>
+                                    <td style="display: none;">{{list_em_calibracao[8]}}</td>
+                                    <td style="display: none;">{{list_em_calibracao[9]}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body" id="ACalibrarTable" style="display: none;">
+                    <div class="table-responsive" style="max-height: 100%; overflow-y: auto;">
+                        <table class="table table-bordered" id="dataTableACalibrar" width="100%" cellspacing="0" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th>Tag Equipamento</th>
+                                    <th>Equipamento</th>
+                                    <th>Responsável</th>
+                                    <th>Localização</th>
+                                    <th>Última Calibração</th>
+                                    <th>Tempo para a Calibração</th>
+                                    <th>Opções</th>
+                                    <th style="display: none;">Unidade</th>
+                                    <th style="display: none;">tipoControle</th>
+                                    <th style="display: none;">periodicidade</th>
+                                    <th style="display: none;">metodo</th>
+                                    <th style="display: none;">faixaNominal</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Tag Equipamento</th>
+                                    <th>Equipamento</th>
+                                    <th>Responsável</th>
+                                    <th>Localização</th>
+                                    <th>Última Calibração</th>
+                                    <th>Tempo para a Calibração</th>
+                                    <th>Opções</th>
+                                    <th style="display: none;">Unidade</th>
+                                    <th style="display: none;">tipoControle</th>
+                                    <th style="display: none;">periodicidade</th>
+                                    <th style="display: none;">metodo</th>
+                                    <th style="display: none;">faixaNominal</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for list_a_calibrar in list_query_a_calibrar %}
+                                <tr onclick="justTag('{{ list_a_calibrar[0] }}')">
+                                    <td>{{list_a_calibrar[0]}}</td>
+                                    <td>{{list_a_calibrar[1]}}</td>
+                                    <td>{{list_a_calibrar[4]}}</td>
+                                    <td>{{list_a_calibrar[3]}}</td>
+                                    <td>{{list_a_calibrar[6]}}</td>
+                                    {% if (list_a_calibrar[15] - list_a_calibrar[14]) > 0 %}
+                                    <td>Está atrasado a {{list_a_calibrar[15] - list_a_calibrar[14]}} dias</td>
+                                    {% elif (list_a_calibrar[15] - list_a_calibrar[14]) == 0 %}
+                                    <td>Hoje é o dia da Calibração</td>
+                                    {% else %}
+                                    <td>Faltam {{list_a_calibrar[14] - list_a_calibrar[15]}} dias</td>
+                                    {% endif %}
+                                    <td class="p-0" style="align-items: center;">
+                                        <div class="col-sm-4 d-flex justify-content-center align-items-center" style="padding-left: 0.35rem;">
+                                            <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px;">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </a>
+                                            <!-- </button> -->
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                                <a id="btn_exec" class="dropdown-item dropdown_os" style="cursor: pointer;" onclick="modalEnvioModal()"> 
+                                                    Envio
+                                                </a>
+                                                <a id="btn_exec" class="dropdown-item dropdown_os" style="cursor: pointer;" onclick="modalConfiguracao(this)"> 
+                                                    Configuracão
+                                                </a>
+                                                <a class = "dropdown-item dropdown_os dropdownsss" style="cursor: pointer;" class="btn" onclick="modalExcluir('{{list_a_calibrar[0]}}')"> 
+                                                    Excluir 
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="display: none;">{{list_a_calibrar[2]}}</td>
+                                    <td style="display: none;">{{list_a_calibrar[5]}}</td>
+                                    <td style="display: none;">{{list_a_calibrar[7]}}</td>
+                                    <td style="display: none;">{{list_a_calibrar[8]}}</td>
+                                    <td style="display: none;">{{list_a_calibrar[9]}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body" id="CalibradoTable" style="display: none;">
+                    <div class="table-responsive" style="max-height: 100%; overflow-y: auto;">
+                        <table class="table table-bordered" id="dataTableCalibrado" width="100%" cellspacing="0" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th>Tag Equipamento</th>
+                                    <th>Equipamento</th>
+                                    <th>Responsável</th>
+                                    <th>Localização</th>
+                                    <th>Última Calibração</th>
+                                    <th>Próxima Calibração</th>
+                                    <th>Opções</th>
+                                    <th style="display: none;">Unidade</th>
+                                    <th style="display: none;">tipoControle</th>
+                                    <th style="display: none;">periodicidade</th>
+                                    <th style="display: none;">metodo</th>
+                                    <th style="display: none;">faixaNominal</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Tag Equipamento</th>
+                                    <th>Equipamento</th>
+                                    <th>Responsável</th>
+                                    <th>Localização</th>
+                                    <th>Última Calibração</th>
+                                    <th>Próxima Calibração</th>
+                                    <th>Opções</th>
+                                    <th style="display: none;">Unidade</th>
+                                    <th style="display: none;">tipoControle</th>
+                                    <th style="display: none;">periodicidade</th>
+                                    <th style="display: none;">metodo</th>
+                                    <th style="display: none;">faixaNominal</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for list_calibrado in list_query_calibrado %}
+                                <tr>
+                                    <td>{{list_calibrado[0]}}</td>
+                                    <td>{{list_calibrado[1]}}</td>
+                                    <td>{{list_calibrado[4]}}</td>
+                                    <td>{{list_calibrado[3]}}</td>
+                                    <td>{{list_calibrado[6]}}</td>
+                                    <td>{{list_calibrado[17]}}</td>
+                                    <td class="p-0" style="align-items: center;">
+                                        <div class="col-sm-4 d-flex justify-content-center align-items-center" style="padding-left: 0.35rem;">
+                                            <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px;">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </a>
+                                            <!-- </button> -->
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                                <a class = "dropdown-item" style="cursor: pointer;" class="btn" onclick="modalTimeline('{{list_calibrado[0]}}')"> 
+                                                    Histórico 
+                                                </a>
+                                                <a id="btn_exec" class="dropdown-item dropdown_os" style="cursor: pointer;" onclick="modalConfiguracao(this)"> 
+                                                    Configuracão
+                                                </a>
+                                                <a class = "dropdown-item dropdown_os dropdownsss" style="cursor: pointer;" class="btn" onclick="modalExcluir('{{list_calibrado[0]}}')"> 
+                                                    Excluir 
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="display: none;">{{list_calibrado[2]}}</td>
+                                    <td style="display: none;">{{list_calibrado[5]}}</td>
+                                    <td style="display: none;">{{list_calibrado[7]}}</td>
+                                    <td style="display: none;">{{list_calibrado[8]}}</td>
+                                    <td style="display: none;">{{list_calibrado[9]}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" data-backdrop="static" id="cadastroModal" tabindex="-1" role="dialog" aria-labelledby="cadastroModalLabel" aria-hidden="true" style="font-size: 12px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    
+                    <h5 class="font-weight-bold text-info mt-2">Cadastro de Tag's</h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Inicio aba do Modal de TAG -->
+                <div class="modal-body p-4" id="cadastroTagModalBody" style="font-size: 12px;">
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Tag</label>
+                            <input type="text" class="form-control" style="height: 38px; font-size: 12px;" name="tag" id="tag" readonly="readonly">
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="equipamento">Criar Tag</label>
+                            <input type="text" class="form-control" style="height: 38px; font-size: 12px;" name="serie" id="serie" oninput="updateTag()">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_equipamento">Equipamento</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_equipamento" onchange="updateTag();atualizarTag('tag_equipamento','tag_unidade','tag_nominal');" id="tag_equipamento" required>
+                                <option value="" selected disabled hidden></option>  
+                                {% for equipamento in equipamentos %}
+                                <option value="{{equipamento[0]}}">{{equipamento[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="equipamento">Tolerância Admissível</label>
+                            <input type="number" class="form-control" style="height: 38px; font-size: 12px;" name="tag_tolerancia_admissivel" id="tag_tolerancia_admissivel">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_nominal">Faixa Nominal</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_nominal" id="tag_nominal" required>
+                            </select> 
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_unidade">Unidade</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_unidade" id="tag_unidade" required>
+                            </select>
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_localizacao">Localização</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_localizacao" id="tag_localizacao" onchange="updateTag()" required>
+                                <option value="" selected disabled hidden></option>  
+                                <option>Administrativo</option>
+                                <option>Estamparia</option>
+                                <option>Solda</option>
+                                <option>Montagem</option>
+                                <option>Pintura</option>
+                                <option>Carpintaria</option>
+                                <option>Almoxarifado</option>
+                                <option>Usinagem</option>
+                                <option>Manutenção</option>
+                                <option>Qualidade</option>
+                                <option>Serra</option>
+                                <option>Corte</option>
+                                <option>Serralheria</option>
+                                <option value="Equipamentos de Movimentação">Equipamentos de Movimentação</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_responsavel">Responsável</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_responsavel" id="tag_responsavel" required>
+                                <option value="" selected disabled hidden></option>  
+                                {% for responsavel in responsaveis %}
+                                <option value="{{responsavel[0]}}" >{{responsavel[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="coluna_causa_nova" class="col-sm-6 mb-4">
+                            <label for="tag_controle">Tipo de Controle</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_controle" id="tag_controle" required>
+                                <option value="" selected disabled hidden></option>  
+                                <option>Calibração</option>
+                                <option>Verificação</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_data">Data da Última Calibração</label>
+                            <input type="date" class="form-control" style="height: 38px; font-size: 12px;" name="tag_data" id="tag_data" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_periodicidade">Periodicidade <small style="color: red;"> *Em meses</small></label>
+                            <input type="number" class="form-control" style="height: 38px; font-size: 12px;" name="tag_periodicidade" id="tag_periodicidade" required>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_metodo">Método</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_metodo" id="tag_metodo" required>
+                                <option value="" selected disabled hidden></option>  
+                                <option>Externo</option>
+                                <option>Interno</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_status">Status do Equipamento</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="tag_status" id="tag_status" required>
+                                <option value="" selected disabled hidden></option>  
+                                <option>Uso</option>
+                                <option>Desuso</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer pb-0 pr-0">
+                        <button class="btn btn-info" id="cadastrarBtn"style="font-size: 12px;" >Cadastrar Tag</button>
+                    </div>
+                </div>
+                <!-- Fim aba do Modal de TAG -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Vídeo -->
+    <div class="modal fade" data-backdrop="static" id="recebimentoModal" tabindex="-1" role="dialog" aria-labelledby="recebimentoModalLabel" aria-hidden="true" style="font-size: 12px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="font-weight-bold text-info mt-2">Recebimento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-sm-6 mb-4" style="display: none;" >
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="id_envio" id="id_envio" disabled>  
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="editar_nome">Equipamento</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="editar_nome"
+                                id="editar_nome" disabled>    
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="editar_matricula">Faixa Norminal</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="editar_matricula" id="editar_matricula" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Unidade</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="editar_unidade"
+                                id="editar_unidade" disabled>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label>Localização</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="editar_localizacao" id="editar_localizacao" disabled>    
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Responsável</label>
+                            <select class="form-control" name="editar_responsavel" id="editar_responsavel" style="height: 38px;font-size: 12px;" disabled>
+                                <option value=""></option>
+                                {% for responsavel in responsaveis %}
+                                <option value="{{responsavel[0]}}">{{responsavel[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label>Tipo de Controle</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="editar_controle"
+                                id="editar_controle" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="coluna_causa" class="col-sm-6 mb-4">
+                            <label>Método</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="editar_metodo"
+                                id="editar_metodo" disabled>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label>Recebimento</label>
+                            <input type="date" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="editar_ult_calibracao" id="editar_ult_calibracao" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Periodicidade</label>
+                            <input type="number" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="editar_periodicidade" id="editar_periodicidade" disabled>
+                        </div>
+                        <div id="coluna_causa" class="col-sm-6 mb-4">
+                            <label>Status</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="editar_status"
+                                id="editar_status" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="editar_emt">Tendência</label>
+                            <input type="number" class="form-control" style="height: 38px;font-size: 12px;" name="editar_emt"
+                                id="editar_emt">
+                        </div>
+                        <div id="coluna_causa" class="col-sm-6 mb-4">
+                            <label for="editar_ema">Incerteza</label>
+                            <input type="number" class="form-control" style="height: 38px;font-size: 12px;" name="editar_ema"
+                                id="editar_ema">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="erro_total">Erro Total</label>
+                            <input type="number" class="form-control" style="height: 38px;font-size: 12px;" name="erro_total"
+                                id="erro_total" readonly="readonly">
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="editar_url">URL</label>
+                            <input type="url" class="form-control" style="height: 38px;font-size: 12px;" name="editar_url"
+                                id="editar_url">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="ganhar" style="font-size: 12px;" class="btn btn-info">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" data-backdrop="static" id="envioModal" tabindex="-1" role="dialog" aria-labelledby="envioModalLabel" aria-hidden="true" style="font-size: 12px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="font-weight-bold text-info mt-2">Envio</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label for="editar_fornecedor">Laboratório</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="editar_fornecedor" id="editar_fornecedor">  
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="editar_data_envio">Data Envio</label>
+                            <input type="date" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="editar_data_envio" id="editar_data_envio">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-info" style="font-size: 12px;" id="enviar_calibracao">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" data-backdrop="static" id="configModal" tabindex="-1" role="dialog" aria-labelledby="configModalLabel" aria-hidden="true" style="font-size: 12px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="font-weight-bold text-info mt-2">Configuração</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <input type="text" name="tag_config" id="tag_config" class="form-control" style="display: none;" disabled> 
+                        <div class="col-sm-6 mb-4">
+                            <label for="tag_equipamento">Equipamento</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="config_editar_equip" onload="atualizarTag();" id="config_editar_equip" disabled>
+                                <option value="" selected disabled hidden></option>  
+                                {% for equipamento in equipamentos %}
+                                <option value="{{equipamento[0]}}">{{equipamento[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="config_editar_faixa">Faixa Norminal</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="config_editar_faixa" id="config_editar_faixa">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Unidade</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;" name="config_editar_unidade"
+                                id="config_editar_unidade">
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label>Localização</label>
+                            <input type="text" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="config_editar_localizacao" id="config_editar_localizacao" disabled>    
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Responsável</label>
+                            <select class="form-control" name="config_editar_responsavel" id="config_editar_responsavel" style="height: 38px;font-size: 12px;">
+                                <option value=""></option>
+                                {% for responsavel in responsaveis %}
+                                <option value="{{responsavel[0]}}">{{responsavel[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label for="config_editar_controle">Tipo de Controle</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="config_editar_controle" id="config_editar_controle" required>
+                                <option value="" selected disabled hidden></option>  
+                                <option>Calibração</option>
+                                <option>Verificação</option>
+                            </select>    
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="coluna_causa" class="col-sm-6 mb-4">
+                            <label>Método</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="config_editar_metodo" id="config_editar_metodo" required>
+                                <option value="" selected disabled hidden></option>  
+                                <option>Externo</option>
+                                <option>Interno</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 mb-4">
+                            <label>Última Calibração</label>
+                            <input type="date" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="config_editar_ult_calibracao" id="config_editar_ult_calibracao" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
+                            <label>Periodicidade</label>
+                            <input type="number" class="form-control" style="height: 38px;font-size: 12px;"
+                                name="config_editar_periodicidade" id="config_editar_periodicidade">
+                        </div>
+                        <div id="coluna_causa" class="col-sm-6 mb-4">
+                            <label>Status</label>
+                            <select class="form-control" style="height: 38px; font-size: 12px;" name="config_editar_status" id="config_editar_status">
+                                <option value="" selected disabled hidden></option>  
+                                <option>Uso</option>
+                                <option>Desuso</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="config_envio" style="font-size: 12px;" class="btn btn-info">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" data-backdrop="static" id="modalTimeline" tabindex="-1" role="dialog" aria-labelledby="modalTimelineLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="m-0 font-weight-bold text-info">Histórico</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="height: 60vh; overflow-y: auto;">
+                    <div class="list-group" id="listaHistorico">
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" data-backdrop="static" id="modalEditarTimeline" tabindex="-1" role="dialog" aria-labelledby="modalEditarTimelineLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="m-0 font-weight-bold text-info"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="height: 60vh; overflow-y: auto;">
+                    <div class="row">
+                        <input type="text" name="id_registro" id="id_registro" class="form-control" style="display: none;" disabled> 
+                        <div class="col-sm-4 mb-4">
+                            <label>Data chegada</label>
+                            <input type="text" class="form-control" style="height: 38px;" id="data_chegada_timeline" name="data_chegada_timeline" disabled>
+                        </div>
+                        <div class="col-sm-4 mb-4">
+                            <label for="editar_nome">Tendência</label>
+                            <input type="text" class="form-control" style="height: 38px;" id="tendencia_timeline" name="tendencia_timeline" disabled>    
+                        </div>
+                        <div class="col-sm-4 mb-4">
+                            <label for="editar_matricula">Incerteza</label>
+                            <input type="text" class="form-control" style="height: 38px;" id="incerteza_timeline" name="incerteza_timeline" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-10 mb-4">
+                            <label>URL</label>
+                            <input type="text" class="form-control" id="url_timeline" name="url_timeline" style="height: 38px;">    
+                        </div>
+                        <div class="col-sm-2 mt-4">
+                            <button class="btn btn-info" onclick="copiarValor()"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="editar_timeline" class="btn btn-info">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalExcluir" tabindex="-1" role="dialog" aria-labelledby="TituloModalCentralizado" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TituloModalCentralizado">
+                        <i class="fas fa-exclamation-triangle text-warning"></i> <!-- Ícone de atenção -->
+                        Atenção
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" style="font-size: 12px;" id="btnExcluir">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner-border text-info" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+
+<div id="mensagem"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- script para datatable -->
+<script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Plugin icons -->
+<script src="https://kit.fontawesome.com/d1807a784c.js" crossorigin="anonymous"></script>
+
+<!-- script com a construção das tabelas -->
+<script src="static/js/demo/datatables-demo.js"></script>
+
+<!-- Script menssagem -->
+<script src="/static/js/mensagem.js"></script>
+<script src="/static/javascript/modal.js"></script>
+<script src="/static/javascript/tag.js"></script>
+<script src="/static/javascript/scripts-home.js"></script>
+
+{% endblock %}

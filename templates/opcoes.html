@@ -1,0 +1,487 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="botoes_gerar_consultar">
+   <div class="custom-card2">
+      <h1 style="font-size: 30px;">Selecione uma opção:</h1>
+      <div class="opcoes_botoes">
+         <a href="/"><button class="gerar_proposta">Gerar Proposta</button></a>
+         <a href="/consulta"><button class="consulta_precos">Consulta de preços</button></a>
+         <button class="cadastrar_cliente" name="Cadastrar" id="modal-cadastrar-cliente">Cadastrar Cliente</button>
+         <button class="interacao_cliente" name="Interações" id="botao-modal-interacao">Interações</button>
+         <button class="pedidos_cliente btn-info" name="pedidos" id="pedidos-ganhos">Pedidos</button>
+      </div>
+   </div>
+</div>
+
+<div class="container pt-4" style="transition: 0.5s; max-width: 1440px;">
+   <div class="row">
+      <div class="col-md-6 mb-3">
+
+         <div class="input-group" style="width: 65%;">
+
+            <input type="text" id="searchInput" class="form-control" placeholder="Filtrar qualquer valor">
+            <div class="input-group-append">
+               <span class="input-group-text">
+                  <i class="fa fa-search"></i>
+               </span>
+            </div>
+
+         </div>
+      </div>
+   </div>
+   <div class="row" id="cardInicio">
+
+   </div>
+
+   <div class="row">
+      <div class="col-md-6 mb-3">
+         <button class="btn btn-info" id="carregarItens" style="width: 200px; font-size: 12px;">Carregar Itens (Funil de Vendas)</button>
+      </div>
+   </div>
+
+      <div class="modal fade" id="modalPerder" data-bs-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="modalPerderLabel">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="modalPerderLabel">Perder proposta</h5>
+                  <button type="button" class="close" aria-label="Fechar">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body-perder">
+                  <!-- Conteúdo será preenchido dinamicamente usando JavaScript -->
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="modal fade" id="modalSimNao" data-bs-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="modalSimNaoLabel">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-body" id="modal-body-simNao">
+                  <!-- Conteúdo do Modal Sim ou Nao -->
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="modal fade" id="modalInteracao" data-bs-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="modalInteracaoLabel">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-body">
+                  <!-- Conteúdo do Modal Sim ou Nao -->
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="modal fade" id="modalGanhar" data-bs-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="modalGanharLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-body">
+                  <!-- Conteúdo do Modal Ganhar -->
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="modal fade" id="modalPedidos" data-bs-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="modalPedidosLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="modalGanharLabel">Pedidos</h5>
+                  <button type="button" class="close" aria-label="Fechar" style="margin: 10px;">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                  <div class="col-md-6 mb-3">
+                     <button class="btn btn-info" id="carregarPedidos" style="width: 200px;">Carregar Pedidos </button>
+                  </div>
+                  <div class="row" id="cadastrar-pedido">
+                     
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+</div>
+
+<div id="success-message" class="alert alert-success top-message slide-in" style="display: none;">
+   Ação bem-sucedida! Sua mensagem de sucesso aqui.
+</div>
+
+<div id="loading-overlay" style="display: none;">
+   <div id="loading-spinner"></div>
+</div>
+
+<script src="/static/js/buscando_api.js"></script>
+<script src="/static/js/envios.js"></script>
+<script src="/static/js/modal.js"></script>
+
+<script>
+   function botaoAdicionarContato(){
+      // Ao clicar no botão "plus"
+      var campo_input = $(".campo_input");
+      $(".botao_plus").on("click", function () {
+         // Encontre os elementos associados ao card específico
+         var cardContent = $(this).closest('.card-content');
+         var campoAdicional = cardContent.siblings('.campo_adicional');
+
+         // Exibir o campo adicional apenas no card clicado
+         campoAdicional.show();
+      });
+
+      // Ao clicar no botão "cancelar"
+      $(".botao_cancelar").on("click", function () {
+         // Ocultar o campo adicional associado ao botão clicado
+         $(this).closest('.campo_adicional').hide();
+         campo_input.val('')
+      });
+   }
+</script>
+
+<script>
+   let clicksItens = 0; // valor inicial de top
+   let clicksPedidos = 0; // valor inicial de top
+   let skipValue = 0; // valor inicial de skip
+
+   let carregarEmAndamento = document.getElementById("carregarItens")
+   let carregarPedidos = document.getElementById("carregarPedidos")
+
+   carregarEmAndamento.addEventListener('click', function() {
+         let statusId = 1;
+         skipValue = 30 * clicksItens
+         enviarRequisicao(statusId,'cardInicio',4,30);
+         console.log(skipValue)
+         clicksItens++
+   });
+
+   carregarPedidos.addEventListener('click', function() {
+         let statusId = 2;
+         skipValue = 30 * clicksPedidos
+         enviarRequisicao(statusId,'cadastrar-pedido',6,15);
+         console.log(skipValue)
+         clicksPedidos++
+   });
+
+   function enviarRequisicao(statusId,id_card,margin,topValue) {
+      $("#loading-overlay").show();
+       fetch('/mouse-down', {
+           method: 'POST',
+           headers: {
+               'Content-Type': 'application/json'
+           },
+           body: JSON.stringify({
+               statusId:statusId,
+               skip: skipValue,
+               top:topValue
+           })
+       })
+      .then(response => response.json())
+      .then(data => {
+         if(data === "Terminou"){
+            $("#loading-overlay").hide();
+            alert("Não possui mais itens")
+            return
+         }
+           // lógica para lidar com a resposta do servidor
+           const containerRow = document.getElementById(id_card);
+
+            data.forEach(dado => {
+               containerRow.innerHTML  += `
+                  <div class="col-md-${margin} mb-3" id="containerDosCards">
+                        <div class="custom-card">
+                           <div class="card-body">
+                              <input class="id-deals" type="text" value="${dado.DealId}" style="display: none;">
+                              <input class="nome-empresa" type="text" value="${dado.ContactName}" style="display: none;">
+                              ${dado.PersonId === null && dado.StatusId === 1? 
+                                 `
+                                 <div class="card-content" style="display: flex; justify-content: space-between;">
+                                    <h6 class="card-text">${dado.ContactName} - ${dado.DealId}</h6>
+                                    <i class="fa-solid fa-plus botao_plus" style="color: gray; cursor: pointer;" title="Adicione um contato"></i>
+                                 </div>
+                                 <p style="color: red;">Adicione um contato para ganhar proposta</p>
+                                 <div class="campo_adicional" style="display: none;">
+                                    <div class="caret-down"></div>
+                                    <h6 style="border-bottom: 1px solid lightgrey; padding: 5px;">Adicionar Contato</h6>
+                                    <div style="margin-top: 10px; margin-bottom: 10px;">
+                                       <label>Contato: </label>
+                                       <input type="text" class="form-control campo_input">
+                                       <div class="suggestions_2 suggestions_campo_input" style="display: none;"></div>
+                                    </div>
+                                    <button class="btn btn-info btn-sm salvarContato" onclick="enviarDeals($(this).closest('.custom-card'))">Salvar</button>
+                                    <button class="btn btn-danger btn-sm botao_cancelar">Cancelar</button>
+                                 </div>
+                                 ` 
+                                 : dado.PersonId !== null && dado.StatusId === 2?
+                                 `
+                                 <h6 class="card-text">${dado.ContactName} - ${dado.DealId}</h6>
+                                 `
+                                 : dado.ExternallyAccepted === 'Sim' && dado.StatusId === 1?
+                                 `
+                                 <h6 class="card-text">${dado.ContactName} - ${dado.DealId}</h6>
+                                 `
+                                 :
+                                 `
+                                 <div class="card-content" style="display: flex; justify-content: space-between;">
+                                    <h6 class="card-text">${dado.ContactName} - ${dado.DealId}</h6>
+                                    <br>
+                                 </div>
+                                 <p style="color: red;">Aceite a proposta para poder ganhá-la</p>
+                                 `
+
+                              }
+                              <p class="data-aceito card-aceito">Aceito: ${dado.ExternallyAccepted === 'Sim' ? `<span style="color: green;">${dado.ExternallyAccepted}</span>` : `<span style="color: red;">${dado.ExternallyAccepted}</span>`}</p>
+                              ${dado.ApprovalStatusId === 1 ? `
+                                    <p class="card-text">
+                                       <i class="fas fa-exclamation-triangle button-icon" style="color: orange;"></i> Aguardando aprovação
+                                    </p>
+                              ` : ''}
+                              <p class="data-status card-status">Status: 
+                                    ${dado.StatusId === 1 ? `<span style="color: blue;">Em Aberto</span>` : (dado.StatusId === 2 ? `<span style="color: green;">Ganha</span>` : `<span style="color: red;">Perdida</span>`)}
+                              </p>
+                              <p class="card-text">Data: ${dado.LastUpdateDate}</p>
+                              <p class="card-text">Valor: R$ ${dado.Amount}</p>
+                              <p class="card-text">
+                                    PDF:
+                                    <span class="pdf-data" style="display: none;">${dado.link.pdf}</span>
+                                    <span class="copy-icon" onclick="copyText('${dado.link.pdf}')"><i class="fas fa-copy"></i></span>
+                                    <a href="${dado.link.pdf}" target="_blank"><i class="fa-solid fa-file"></i></a>
+                                    Aceite:
+                                    <span class="aceite-data" style="display: none;">${dado.link.aceite}</span>
+                                    <span class="copy-icon" onclick=copyText('${dado.link.aceite}')"><i class="fas fa-copy"></i></span>
+                                    <a href="${dado.link.aceite}" target="_blank"><i class="fa-solid fa-file"></i></a>
+                                    ${dado.StatusId === 2 && dado.link_venda != '' ? `
+                                       Venda:
+                                       <span class="pdf-venda-data" style="display: none;">${dado.link_venda}</span>
+                                       <span class="copy-icon" onclick="copyText('${dado.link_venda}')"><i class="fas fa-copy"></i></span>
+                                       <a href="${dado.link_venda}" target="_blank"><i class="fa-solid fa-file"></i></a>
+                                    ` : ''}
+                              </p>
+                              ${dado.StatusId === 2 || dado.StatusId === 3 || dado.ApprovalStatusId === 1 ? `
+                                       <a class="btn btn-success btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalRevisar('${dado.DealId}')">Revisar</a>
+                              ` : `
+                                       ${dado.ExternallyAccepted !== 'Sim' ? `
+                                       <a class="btn btn-danger btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalPerder('${dado.DealId}', '${dado.ContactName}')">Perder</a>
+                                       <a class="btn btn-info btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="reenviarEmail('${dado.DealId}', '${dado.ContactName}')">Reenviar e-mail</a>
+                                       <a class="btn btn-success btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalRevisar('${dado.DealId}')">Revisar</a>
+                                    ` : dado.PersonId !== null ?
+                                    `  
+                                       <a class="btn btn-success btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalGanhar('${dado.DealId}')">Ganhar</a>
+                                       <a class="btn btn-danger btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalPerder('${dado.DealId}', '${dado.ContactName}')">Perder</a>
+                                       <a class="btn btn-info btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="reenviarEmail('${dado.DealId}', '${dado.ContactName}')">Reenviar e-mail</a>
+                                       <a class="btn btn-success btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalRevisar('${dado.DealId}')">Revisar</a>
+                                    `: 
+                                    `
+                                       <a class="btn btn-danger btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalPerder('${dado.DealId}', '${dado.ContactName}')">Perder</a>
+                                       <a class="btn btn-info btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="reenviarEmail('${dado.DealId}', '${dado.ContactName}')">Reenviar e-mail</a>
+                                       <a class="btn btn-success btn-sm" style="color: #fff; padding: 0.1rem 0.5rem;" onclick="showModalRevisar('${dado.DealId}')">Revisar</a>
+                                    `
+                                    }
+                              `}
+                           </div>
+                        </div>
+                  </div>
+               `;
+            });
+            $("#loading-overlay").hide();
+            botaoAdicionarContato()
+       })
+       .catch(error => {
+            $("#loading-overlay").hide();
+           console.error('Erro ao enviar requisição:', error);
+       });
+   }
+</script>
+
+<script>
+
+   $(document).ready(function () {
+      function contatos_Valores() {
+         var campo_inputs = $('.campo_input');
+         var suggestions_campo_inputs = $('.suggestions_campo_input');
+         var salvar_contato = $('.salvarContato');
+
+         campo_inputs.on('input', function () {
+            var inputValue = $(this).val();
+            var suggestions_campo_input = $(this).siblings('.suggestions_campo_input');
+
+            if (inputValue.trim() === '') {
+               suggestions_campo_input.hide();
+               return;
+            }
+
+            inputNomesContatos(inputValue)
+               .then(function (contatosResponse) {
+                  suggestions_campo_input.empty();
+
+                  contatosResponse.forEach(function (contato) {
+                     var suggestionItem;
+
+                     if (contato.Company) {
+                        suggestionItem = $('<div class="suggestion-item">' + contato.Name + '<strong> (' + contato.Company.Name + ')</strong>' + '</div>');
+                     } else {
+                        suggestionItem = $('<div class="suggestion-item">' + contato.Name + '</div>');
+                     }
+
+                     suggestionItem.on('mousedown', function (event) {
+                        event.preventDefault();
+                        suggestions_campo_input.hide();
+                        suggestions_campo_input.empty();
+                        campo_inputs.val(contato.Name);
+                     });
+
+                     suggestions_campo_input.append(suggestionItem);
+                     suggestions_campo_input.show();
+                  });
+               })
+               .catch(function (error) {
+                  console.error(error);
+               });
+         });
+
+         campo_inputs.on('blur', function () {
+            // Agora, o código a seguir é executado quando o campo perde o foco
+            suggestions_campo_inputs.hide();
+         });
+      }
+
+      // Chama a função quando o documento estiver pronto
+      contatos_Valores();
+   });
+
+
+</script>
+
+<script>
+   // Script para procurar na lista de cards
+   document.getElementById("searchInput").addEventListener("input", function () {
+      var searchValue = this.value.toLowerCase();
+      var cards = document.querySelectorAll("#containerDosCards");
+
+      cards.forEach(function (card) {
+         var cardText = card.textContent.toLowerCase();
+         if (cardText.includes(searchValue)) {
+            card.style.display = "block";
+         } else {
+            card.style.display = "none";
+         }
+      });
+   });
+
+</script>
+
+<script>
+   function reenviarEmail(dealId, nomeCliente) {
+      // Exiba o overlay de carregamento
+      $("#loading-overlay").show();
+
+      // Dados a serem enviados para o backend
+      const data = {
+         dealId: dealId,
+         nomeCliente: nomeCliente
+      };
+
+      // Configuração da solicitação
+      const requestOptions = {
+         method: 'POST', // Use 'POST' para enviar dados para o backend
+         headers: {
+            'Content-Type': 'application/json' // Tipo de conteúdo JSON
+         },
+         body: JSON.stringify(data) // Converte os dados em formato JSON
+      };
+
+      // URL do endpoint no seu backend
+      const backendEndpoint = '/reenviarEmail';
+
+      // Faça a solicitação POST para o backend
+      fetch(backendEndpoint, requestOptions)
+         .then(response => {
+            if (!response.ok) {
+               throw new Error('Erro ao enviar dados para o backend');
+            }
+            return response.json(); // Se o backend responder com JSON
+         })
+         .then(responseData => {
+            // Manipule a resposta do backend, se necessário
+            console.log('Resposta do Backend:', responseData);
+
+            // Oculte o overlay após receber a resposta
+            $("#loading-overlay").hide();
+         })
+         .catch(error => {
+            console.error('Erro:', error);
+
+            // Oculte o overlay em caso de erro também
+            $("#loading-overlay").hide();
+         });
+   }
+
+</script>
+
+<script>
+
+   // Modal para abrir opções de cadastro de cliente ou contato
+
+   // Associar o evento de clique ao botão "Cadastrar Cliente ou contato"
+   $(document).on('click', '#modal-cadastrar-cliente', function (event) {
+      showModalEscolhaClienteOuContato(event);
+   });
+
+   // Fechar o modal ao clicar no botão de fechar
+   $('#modalGanhar').on('click', '.close', function () {
+      $('#modalGanhar').modal('hide');
+   });
+
+   $(document).on('click', '#botao-modal-interacao', function (event) {
+      $('#modalGanhar').modal('hide');
+      showModalInteracao(event);
+   });
+
+   $(document).on('click', '#pedidos-ganhos', function (event) {
+      showModalPedidos(event);
+   });
+
+   // Fechar o modal ao clicar no botão de fechar
+   $('#modalPedidos').on('click', '.close', function () {
+      $('#modalPedidos').modal('hide');
+   });
+
+   $(document).on('click', '#btnVoltar', function (event) {
+      // Feche o modal atual
+      $('#cadastrar-empresa').modal('hide');
+
+      // Agora, abra o modal de escolha entre cliente ou contato
+      showModalEscolhaClienteOuContato(event);
+   });
+
+   // Associar o evento de clique ao botão "Cadastrar Empresa"
+   $(document).on('click', '#cadastrar-empresa', function (event) {
+      showModalCriarEmpresa(event);
+   });
+
+   // Fechar o modal ao clicar no botão de fechar
+   $('#modalGanhar').on('click', '.close', function () {
+      $('#modalGanhar').modal('hide');
+   });
+
+   // Associar o evento de clique ao botão "Cadastrar contato"
+   $(document).on('click', '#cadastrar-contato', function (event) {
+      showModalCriarContato(event);
+   });
+
+   // Fechar o modal ao clicar no botão de fechar
+   $('#modalGanhar').on('click', '.close', function () {
+      $('#modalGanhar').modal('hide');
+   });
+
+</script>
+
+{% endblock %}
