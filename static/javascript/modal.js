@@ -339,7 +339,7 @@ function showModalGanhar(dealId) {
  }
 
  
- function showModalInteracao(event) {
+ function showModalInteracaoDepreciado(event) {
     event.preventDefault();
     // Defina o conteúdo do modal para a ação "Cadastrar Cliente"
     var modalBody = document.getElementById("modalInteracao").querySelector(".modal-body");

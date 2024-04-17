@@ -284,7 +284,24 @@
          <div class="modal-dialog" role="document">
             <div class="modal-content">
                <div class="modal-body">
-                  <!-- Conteúdo do Modal Sim ou Nao -->
+                  <div class="cadastrar-cliente-interação">
+                     <label>Empresa: </label>
+                     <input type="text" class="form-control" id="empresa_registrar" placeholder="Empresa" autocomplete="off">
+                  </div>
+                  <div class="suggestions" id="suggestionsEmpresasRegistrar">
+
+                  </div>
+                  <div style="display:none">
+                     <div style="display:flex;flex-direction:column;margin-top:20px;gap: 3px;">
+                        <label>Registro: </label>
+                        <textarea id="campo-texto" class="form-control" placeholder="Digite aqui..."></textarea>
+                        <i style="cursor:pointer" id="arrow" class="fa-solid fa-angle-down"></i>
+                     </div>
+                     <div style="display: flex;justify-content: flex-end;align-items: center;color:gray; gap: 5px; margin-top: 10px;">
+                        <label>Campos não obrigatório</label>
+                        <i style="cursor:pointer" id="arrow" class="fa-solid fa-angle-down"></i>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
