@@ -15,7 +15,6 @@ from datetime import date
 import json
 from datetime import datetime, timedelta, timezone
 import uuid
-from sqlalchemy import create_engine
 import warnings
 from babel.numbers import format_currency
 import requests
@@ -35,9 +34,6 @@ DB_PASS = "15512332"
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
                         password=DB_PASS, host=DB_HOST)
-
-engine = create_engine(
-    f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{5432}/{DB_NAME}')
 
 # Você pode ajustar o tamanho máximo do cache conforme necessário
 cache_precos = cachetools.LRUCache(maxsize=128)
