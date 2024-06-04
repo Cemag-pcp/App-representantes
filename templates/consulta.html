@@ -4,7 +4,8 @@
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 {% for message in messages %}
-<div class="alert alert-success alert-dismissible fade show" id="alerta_Os" role="alert">
+<div class="alert alert-success alert-dismissible fade show" id="alerta_Os"
+  role="alert">
   {{ message }}
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">×</span>
@@ -30,7 +31,7 @@
   <div>
     <label for="filtro-descricao">Categoria:</label>
     <select id="filtro-descricao" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for descricao in descricao_unique %}
       <option>{{descricao[0]}}</option>
       {% endfor %}
@@ -39,7 +40,7 @@
   <div>
     <label for="filtro-modelo">Modelo:</label>
     <select id="filtro-modelo" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for modelo in modelo_unique %}
       <option>{{modelo[0]}}</option>
       {% endfor %}
@@ -48,7 +49,7 @@
   <div>
     <label for="filtro-eixo">Eixo:</label>
     <select id="filtro-eixo" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for eixo in eixo_unique %}
       <option>{{eixo[0]}}</option>
       {% endfor %}
@@ -57,7 +58,7 @@
   <div>
     <label for="filtro-molaFreio">Mola/Freio:</label>
     <select id="filtro-molaFreio" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for mola in mola_freio_unique %}
       <option>{{mola[0]}}</option>
       {% endfor %}
@@ -66,7 +67,7 @@
   <div>
     <label for="filtro-tamanho">Tamanho:</label>
     <select id="filtro-tamanho" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for tamanho in tamanho_unique %}
       <option>{{tamanho[0]}}</option>
       {% endfor %}
@@ -75,7 +76,7 @@
   <div>
     <label for="filtro-rodado">Rodado:</label>
     <select id="filtro-rodado" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for rodado in rodado_unique %}
       <option>{{rodado[0]}}</option>
       {% endfor %}
@@ -84,7 +85,7 @@
   <div>
     <label for="filtro-pneu">Pneu:</label>
     <select id="filtro-pneu" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for pneu in pneu_unique %}
       <option>{{pneu[0]}}</option>
       {% endfor %}
@@ -93,7 +94,7 @@
   <div>
     <label for="filtro-descricao-generica">Opcionais:</label>
     <select id="filtro-descricao-generica" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for descricao_generica in descricao_generica_unique %}
       <option>{{descricao_generica[0]}}</option>
       {% endfor %}
@@ -102,19 +103,21 @@
   <div>
     <label for="filtro-lista">Lista de preço:</label>
     <select id="filtro-lista" onchange="atualizarDados()">
-      <option value="">Selecionar</option>
+      <option value>Selecionar</option>
       {% for lista in lista_unique %}
       <option>{{lista[0]}}</option>
       {% endfor %}
     </select>
   </div>
-  <button onclick="limparFiltros()" class="limpar_filtros">Limpar Filtros</button>
-  
+  <button onclick="limparFiltros()" class="limpar_filtros">Limpar
+    Filtros</button>
+
   <div>
     <label for="filtro-produto-mais-vendido">Produtos mais vendidos:</label>
     <div class="toggle" id="maquina-parada-toggle">
       <label class="switch2">
-        <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito" onchange="botaoFavoritos()">
+        <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox"
+          name="favorito" id="favorito" onchange="botaoFavoritos()">
         <span class="slider round"></span>
       </label>
     </div>
@@ -153,7 +156,8 @@
             <td data-label="Lista de preço">{{row[21]}}</td>
             <td data-label="Modelo">{{row[11]}}</td>
             <td data-label="Código" id='codigo'>{{row[0]}}</td>
-            <td data-label="Descrição" class="descricao-dropdown">{{row[13]}}</td>
+            <td data-label="Descrição"
+              class="descricao-dropdown">{{row[13]}}</td>
             <td data-label="Cor">
               <select id="cor" class="cor-dropdown" style="width:160px;">
                 <option value="Laranja" selected>Laranja</option>
@@ -166,25 +170,28 @@
             <td data-label="Preço" style="white-space: nowrap;">
               <select id="preco" class="preco-dropdown" style="width:200px;">
                 <option value="{{row[20]}}" selected>{{row[20]}}</option>
-                {% if representante != 'Lucas Gallo' and representante != 'Renato Rodi' %}
-                  {% if row[22] != '' %}:
-                  <option value="{{row[22]}}">Promo: {{row[22]}}</option>
-                  {% else %}
-                  {% endif %}
-                  {% if row[23] != '' %}:
-                  <option value="{{row[23]}}">Promo c/Frete: {{row[23]}}</option>
-                  {% else %}
-                  {% endif %}
+                {% if representante != 'Lucas Gallo' and representante !=
+                'Renato Rodi' %}
+                {% if row[22] != '' %}:
+                <option value="{{row[22]}}">Promo: {{row[22]}}</option>
+                {% else %}
+                {% endif %}
+                {% if row[23] != '' %}:
+                <option value="{{row[23]}}">Promo c/Frete: {{row[23]}}</option>
+                {% else %}
+                {% endif %}
                 {% else %}
                 {% endif %}
               </select>
             </td>
             <td data-label="% de Desconto">
-              <input class="row-data desconto-input" id="desconto" name="desconto" placeholder="%" style="width: 115px;"
+              <input class="row-data desconto-input" id="desconto"
+                name="desconto" placeholder="%" style="width: 115px;"
                 oninput="updatePrice(event);">
             </td>
             <td data-label="Preço Final">
-              <input class="row-data preco-input" id="precoInput" name="preco" placeholder="Preço c/ desc."
+              <input class="row-data preco-input" id="precoInput" name="preco"
+                placeholder="Preço c/ desc."
                 style="width: 115px;" oninput="formatPriceInput(event);">
             </td>
 
@@ -192,11 +199,13 @@
               <div class="toggle" id="maquina-parada-toggle">
                 <label class="switch2">
                   {% if row[24] == 'on' %}:
-                  <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito"
+                  <input class="btn btn-secondary btn-sm favorito-btn"
+                    type="checkbox" name="favorito" id="favorito"
                     data-row-id="{{row[0]}}" checked>
                   <span class="slider round"></span>
                   {% else %}
-                  <input class="btn btn-secondary btn-sm favorito-btn" type="checkbox" name="favorito" id="favorito"
+                  <input class="btn btn-secondary btn-sm favorito-btn"
+                    type="checkbox" name="favorito" id="favorito"
                     data-row-id="{{row[0]}}">
                   <span class="slider round"></span>
                   {% endif %}
@@ -205,105 +214,116 @@
             </td>
 
             <td data-label="Selecionar">
-              <button class="btn btn-primary btn-sm" onclick="toggleRowColor(this); toggleCardItem(this);"
-                id='botão_enviar_carrinho'><i class="fa-sharp fa-solid fa-paper-plane"></i> Enviar</button>
+              <button class="btn btn-primary btn-sm"
+                onclick="toggleRowColor(this); toggleCardItem(this);"
+                id='botão_enviar_carrinho'><i
+                  class="fa-sharp fa-solid fa-paper-plane"></i> Enviar</button>
             </td>
-            
+
           </tr>
           {% endfor %}
         </tbody>
       </table>
-  </div>
-</div>
-
-<div id="loading-overlay" style="display: none;">
-  <div id="loading-spinner"></div>
-</div>
-
-<div id="modalEnviar" class="modal">
-
-  <div class="modal-content">
-    <span class="close">&times;</span> <!-- Botão de fechar -->
-
-    <div id="filte-nome-select">
-      <label for="filtro-nome-novo">Nome:</label>
-      <input type="text" id="filtro-nome-novo" class="form-control" style="width: 90%;">
-      <select id="resultado-nomes-novo" class="form-control" data-live-search="true" style="width: 90%;"
-        onchange="atualizarCliente()">
-        <option value="">Selecione</option>
-      </select>
     </div>
-
-    <div id="filte-contato">
-      <label for="filtro-contatos-novo">Contatos:</label>
-      <select id="resultado-contatos-novo" class="form-control" data-live-search="true" style="width: 90%;">
-        <option value="">Selecione</option>
-      </select>
-    </div>
-
-    <div>
-      <label for="forma-pagamento">Pagamento:</label>
-      <select id="forma-pagamento" class="form-control" style="width: 90%;">
-        <option></option>
-      </select>
-    </div>
-
-    <div id="responsaveis">
-      <label for="filtro-responsavel">Responsável:</label>
-      <select id="resultado-responsavel" class="form-control" data-live-search="true" style="width: 90%;">
-        <option value="">Selecione</option>
-      </select>
-    </div>
-
-    <div>
-      <label for="observacao">Observações:</label>
-      <textarea id="observacao" rows="4" cols="45"></textarea>
-    </div>
-
-    <button class="enviarModal" id="enviar-button">Enviar</button>
-
   </div>
 
-</div>
+  <div id="loading-overlay" style="display: none;">
+    <div id="loading-spinner"></div>
+  </div>
 
-<div class="modal" id="modal_confirmacao" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
+  <div id="modalEnviar" class="modal">
+
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Tem certeza que deseja enviar os itens abaixo?</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="fechar_confirmacao">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" style="overflow-y: auto; height: 400px;">
-        <div class="form-group">
-          <label>Descrição das Carretas</label>
-          <ul id="codigo_e_carreta_confirmacao">
-          </ul>
-        </div>
+      <span class="close">&times;</span> <!-- Botão de fechar -->
 
+      <div id="filte-nome-select">
+        <label for="filtro-nome-novo">Nome:</label>
+        <input type="text" id="filtro-nome-novo" class="form-control"
+          style="width: 90%;">
+        <select id="resultado-nomes-novo" class="form-control"
+          data-live-search="true" style="width: 90%;"
+          onchange="atualizarCliente()">
+          <option value>Selecione</option>
+        </select>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="botao_nao">Não</button>
-        <button type="button" class="btn btn-success" data-dismiss="modal" id="botao_sim">Sim</button>
+
+      <div id="filte-contato">
+        <label for="filtro-contatos-novo">Contatos:</label>
+        <select id="resultado-contatos-novo" class="form-control"
+          data-live-search="true" style="width: 90%;">
+          <option value>Selecione</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="forma-pagamento">Pagamento:</label>
+        <select id="forma-pagamento" class="form-control" style="width: 90%;">
+          <option></option>
+        </select>
+      </div>
+
+      <div id="responsaveis">
+        <label for="filtro-responsavel">Responsável:</label>
+        <select id="resultado-responsavel" class="form-control"
+          data-live-search="true" style="width: 90%;">
+          <option value>Selecione</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="observacao">Observações:</label>
+        <textarea id="observacao" rows="4" cols="45"></textarea>
+      </div>
+
+      <button class="enviarModal" id="enviar-button">Enviar</button>
+
+    </div>
+
+  </div>
+
+  <div class="modal" id="modal_confirmacao" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tem certeza que deseja enviar os itens
+            abaixo?</h5>
+          <button type="button" class="close" data-dismiss="modal"
+            aria-label="Close" id="fechar_confirmacao">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto; height: 400px;">
+          <div class="form-group">
+            <label>Descrição das Carretas</label>
+            <ul id="codigo_e_carreta_confirmacao">
+            </ul>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger"
+            id="botao_nao">Não</button>
+          <button type="button" class="btn btn-success" data-dismiss="modal"
+            id="botao_sim">Sim</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+  {% endblock %}
 
-{% block scripts %}
+  {% block scripts %}
 
-<script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
-<script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-<!-- Plugin icons -->
-<script src="https://kit.fontawesome.com/d1807a784c.js" crossorigin="anonymous"></script>
+  <!-- Plugin icons -->
+  <script src="https://kit.fontawesome.com/d1807a784c.js"
+    crossorigin="anonymous"></script>
 
-<!-- script com a construção das tabelas -->
-<script src="static/js/demo/datatables-demo.js"></script>
+  <!-- script com a construção das tabelas -->
+  <script src="static/js/demo/datatables-demo.js"></script>
 
-<script>
+  <script>
   // Manipulador de evento de clique para botões favoritos
   $('#table1').on('click', '.favorito-btn', function (event) {
     // Obter o estado do favorito e o ID da linha
@@ -330,14 +350,14 @@
   });
 </script>
 
-<script>
+  <script>
   // Inicialize o Select2 no elemento 'mySelect'
   $(document).ready(function () {
     $('#filtro-nome').select2();
   });
 </script>
 
-<script>
+  <script>
   // Selecionar o elemento do botão de fechar
   var closeButton = document.querySelector(".modal .close");
 
@@ -354,7 +374,7 @@
 
 </script>
 
-<script>
+  <script>
   // Encontre o elemento da coluna de preço original
   const precoOriginalElement = document.querySelector('[data-label="Preço"]');
 
@@ -381,28 +401,28 @@
 
     const precoOriginalTexto = precoOriginalElement.value;
     const precoOriginalNumerico = parseFloat(precoOriginalTexto.replace(/[^\d,]/g, '').replace(',', '.'));
-    
+
+    const selectPreco = row.querySelector('.preco-select');
+    const precoSelecionado = parseFloat(selectPreco.value);
+
     const desconto = parseFloat(descontoInput.value);
     
-    if (!isNaN(desconto)) {
-      const precoComDesconto = precoOriginalNumerico * (1 - desconto / 100);
-      
-      const precoComDescontoFormatado = precoComDesconto.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-      
-      precoInput.value = precoComDescontoFormatado;
-      precoInput.disabled = true;
-    } else {
-      precoInput.disabled = false;
+    if (!isNaN(desconto) && !isNaN(precoSelecionado)) {
+        const precoComDesconto = precoSelecionado * (1 - desconto / 100);
+
+        const precoComDescontoFormatado = precoComDesconto.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+
+        precoInput.value = precoComDescontoFormatado;
     }
-  }
+}
 </script>
 
-<script>
+  <script>
   $(document).ready(function () {
     // Ao clicar no botão "Enviar"
     $('#btnEnviar').click(function () {
@@ -422,7 +442,7 @@
 
 </script>
 
-<script>// Atualizar dados de dropdown e tabela
+  <script>// Atualizar dados de dropdown e tabela
   function atualizarDados() {
     $("#loading-overlay").show();
     var descricao = $('#filtro-descricao').val();
@@ -756,7 +776,7 @@
 
 </script>
 
-<script>// Botão para limpar os filtros
+  <script>// Botão para limpar os filtros
 
   function limparFiltros() {
     var descricaoGenericaSelect = $('#filtro-descricao');
@@ -825,7 +845,7 @@
   }
 </script>
 
-<script>// Atualizar dados de dropdow de clientes
+  <script>// Atualizar dados de dropdow de clientes
   function atualizarCliente() {
     $("#loading-overlay").show();
 
@@ -890,7 +910,7 @@
   }
 </script>
 
-<script>// Function to format the price input
+  <script>// Function to format the price input
 
   function formatPriceInput(event) {
     const input = event.target;
@@ -939,7 +959,7 @@
 
 </script>
 
-<script>
+  <script>
   // Função para enviar os dados para o backend usando fetch
   function sendData(items, nome, contato, formaPagamento, observacoes, nomeResponsavel, idQuote, dealIdBackend) {
     // Crie um objeto com os dados do formulário
@@ -1102,7 +1122,7 @@
 
 </script>
 
-<script>
+  <script>
     function fecharModalConfirmacao() {
         $('#modal_confirmacao').hide();
     }
@@ -1166,7 +1186,7 @@
     })
 
 </script>
-<!-- <script>
+  <!-- <script>
   // Função para copiar os itens e o total para a área de transferência
     
   function copiarItensETotalParaAreaDeTransferencia() {
@@ -1218,7 +1238,7 @@
   copiarItensButton.addEventListener('click', copiarItensETotalParaAreaDeTransferencia);
 </script> -->
 
-<script>// Atualizar dados de dropdow de clientes
+  <script>// Atualizar dados de dropdow de clientes
   function atualizar_regiao() {
     $("#loading-overlay").show();
 
@@ -1271,7 +1291,7 @@
   }
 </script>
 
-<script>
+  <script>
 
   function buscarRepresentanteId(representanteNameValue, skip) {
 
@@ -1448,7 +1468,7 @@
 
 </script>
 
-<script>
+  <script>
   // Função para buscar o Id da companhia
   function buscarCompanyId(clienteName) {
     var apiKey = '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3';
@@ -1533,7 +1553,7 @@
   });
 </script>
 
-<script>
+  <script>
   $(document).ready(function () {
     // Manipulador de clique para o botão de atualização de cache
     $("#atualizar-cache").click(function () {
@@ -1545,7 +1565,7 @@
   });
 </script>
 
-<script>
+  <script>
 
   document.addEventListener("DOMContentLoaded", function () {
     var representanteNameElement = document.getElementById("representante-name");
@@ -1623,8 +1643,8 @@
   });
 </script>
 
-<!-- LIMPAR FILTROS -->
-<script>
+  <!-- LIMPAR FILTROS -->
+  <script>
   function limparFiltros() {
     // Obtenha todos os elementos de select dentro do container de filtro
     const selects = document.querySelectorAll('.filter-wrapper select');
@@ -1639,7 +1659,7 @@
   }
 </script>
 
-<script>
+  <script>
 
   var productList = document.getElementById("product-list");
 
@@ -1949,8 +1969,7 @@
 
 </script>
 
-
-<!-- <script>
+  <!-- <script>
   window.onload = function() {
     fetch('/lista_produtos', { method: 'GET' }) // Solicitação GET para obter os dados da lista de produtos
     .then(response => response.json())
@@ -1975,4 +1994,4 @@
   }
 </script> -->
 
-{% endblock %}
+  {% endblock %}

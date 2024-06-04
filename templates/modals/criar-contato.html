@@ -1,0 +1,227 @@
+<!-- Modal escolha o que cadastrar -->
+<div class="modal fade" id="modalCadastrarCliente" data-backdrop="static"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitlemodalCadastrarCliente" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cadastrar cliente</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"
+                style="max-height: 700px; overflow-y: auto;">
+
+            </div>
+            <div
+                class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <div style="align-self: self-end;">
+                    <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modalCadastrarEmpresa"
+                        data-dismiss="modal"
+                        id="continuarConfirmacao">Empresa
+                    </button>
+                    <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modalCadastrarContato"
+                        data-dismiss="modal"
+                        id="continuarConfirmacaoConsulta">Contato
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Empresa -->
+<div class="modal fade" id="modalCadastrarEmpresa" data-backdrop="static"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitlemodalCadastrarEmpresa" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cadastrar Empresa</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"
+                style="max-height: 700px; overflow-y: auto;">
+
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <label for="inputNomeRevenda">Nome</label>
+                        <input id="inputNomeRevenda" class="form-control"
+                            type="text" autocomplete="off">
+                        <small id="verificacaoNomeEmpresa"
+                            class="form-text text-muted"
+                            style="display: none;">Empresa ja existe!</small>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <label for="telefoneEmpresa">Telefone</label>
+                        <div class="input-group">
+                            <input id="telefoneEmpresa" type="text"
+                                class="form-control" autocomplete="off">
+                            <div class="input-group-append" id="typePhone1">
+                                <select class="custom-select">
+                                    <option value="1"
+                                        selected>Comercial</option>
+                                    <option value="2">Celular</option>
+                                    <option value="3">Residencial</option>
+                                    <option value="4">Fax</option>
+                                    <option value="5">Outros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <label for="inputCnpjRevenda">CNPJ</label>
+                        <input id="inputCnpjRevenda" class="form-control"
+                            type="text" autocomplete="off">
+                        <small id="verificacaoCnpj" class="form-text text-muted"
+                            style="display: none;">Digite um cnpj
+                            válido.</small>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <label for="inputCidadeRevenda">Cidade</label>
+                        <input class="form-control" type="text"
+                            id="inputCidadeRevenda" autocomplete="off">
+                        <ul id="suggestionsCidade"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                    <!-- <div class="col-sm-6">
+                        <label for="inputResponsavelRevenda">Responsável</label>
+                        <input class="form-control" type="text"
+                            id="inputResponsavelRevenda" autocomplete="off">
+                        <ul id="suggestionsResponsavel"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div> -->
+                </div>
+
+            </div>
+            <div class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#modalCadastrarCliente" data-dismiss="modal" id="continuarConfirmacao">Voltar</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#modalPerguntaCadastrarContato" data-dismiss="modal" id="continuarCriarContatoAposEmpresa" disabled>Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pergunta -->
+<div class="modal fade" id="modalPerguntaCadastrarContato"
+    data-backdrop="static"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitlemodalPerguntaCadastrarContato"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Revenda cadastrada com sucesso!</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <p>Deseja cadastrar o contato agora?</p>
+            </div>
+            <div
+                class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <div style="align-self: self-end;">
+                    <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modalCadastrarContato"
+                        data-dismiss="modal"
+                        id="continuarCriarContato">Sim
+                    </button>
+                    <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modalContinuarConsultaPreco"
+                        data-dismiss="modal"
+                        id="continuarConfirmacaoConsulta">Não
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal criar contato -->
+<div class="modal fade" id="modalCadastrarContato" data-backdrop="static"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitlemodalCadastrarContato" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-modal-cadastrar-contato">Criar
+                    contato</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <label for="empresaCadastrada">Empresa:</label>
+                        <input class="form-control" type="text"
+                            id="empresaCadastrada" autocomplete="off">
+                        <ul id="suggestionsPecas"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="nomeContato">Nome do contato</label>
+                        <input class="form-control" id="nomeContato"
+                            type="text" autocomplete="off">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-12">
+                        <label for="telefoneContato">Telefone</label>
+                        <div class="input-group">
+                            <input id="telefoneContato" type="text"
+                                class="form-control" autocomplete="off">
+                            <div class="input-group-append" id="typePhone2">
+                                <select class="custom-select">
+                                    <option value="1"
+                                        selected>Comercial</option>
+                                    <option value="2">Celular</option>
+                                    <option value="3">Residencial</option>
+                                    <option value="4">Fax</option>
+                                    <option value="5">Outros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label for="inputCidadeContato">Cidade</label>
+                        <input class="form-control" type="text"
+                            id="inputCidadeContato" autocomplete="off">
+                        <ul id="suggestionCidadeContato"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#modalCadastrarCliente" data-dismiss="modal" id="continuarConfirmacao">Voltar</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#modalContinuar" data-dismiss="modal" id="salvarCadastroContato_1" disabled>Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+<!-- Modal -->
+<div class="modal fade" id="modalAddContato" tabindex="-1" role="dialog"
+    aria-labelledby="labelTitleModalAddContato" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="labelTitleModalAddContato"></h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="idInserirContato">Escolha o contato</label>
+                <input id="idInserirContato" type="text" class="form-control"
+                    data-id-contato autocomplete="off">
+                <ul id="contatoList" class="custom-dropdown-menu"
+                    style="display: none; max-height: 100px; overflow-y: auto;"></ul>
+            </div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close"
+                    id="salvarContato" type="button"
+                    class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>

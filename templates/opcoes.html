@@ -1,228 +1,99 @@
 {% extends "base.html" %}
 
 {% block links %}
-    <!-- CSS datatable -->
-    <link href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/botoes.css">
+<!-- CSS datatable -->
+<link
+   href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}"
+   rel="stylesheet">
+<link rel="stylesheet" href="/static/css/botoes.css">
+<link rel="stylesheet" type="text/css"
+   href="{{ url_for('static', filename='css/no-more-table.css') }}">
+<link rel="stylesheet" type="text/css"
+   href="{{ url_for('static', filename='css/alertas/alerta-sucesso.css') }}">
+<link rel="stylesheet" type="text/css"
+   href="{{ url_for('static', filename='css/alertas/loading.css') }}">
+<link rel="stylesheet" type="text/css"
+   href="{{ url_for('static', filename='css/dropdown/contato-gerar-proposta.css') }}">
 
 {% endblock %}
 
 {% block container %}
 <div class="container-fluid">
-   <div class="row">
-      <div class="col-md-6 mb-3">
-         <div class="card shadow mb-4">
-            <div class="card-header py-3">
-               <h6 class="m-0 font-weight-bold" style="color:#ffa171;">Gerar proposta</h6>
-            </div>
-            <div class="card-body">
-               <div style="display: flex; flex-direction: column; align-items: center;">
-                  <img src="/static/img/undraw_chore_list_re_2lq8.svg" width="180" height="180">
-                  <p>***Descrição intuitiva para explicar o campo de gerar proposta aos representantes</p>
-               </div>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end;">
-               <a href="/"><button class="btn-gerar">Gerar proposta</button></a>
-            </div>
-         </div>
-      </div>
-      <div class="col-md-6 mb-3">
-         <div class="card shadow mb-4">
-            <div class="card-header py-3">
-               <h6 class="m-0 font-weight-bold" style="color: #36b9cc;">Consultar preços</h6>
-            </div>
-            <div class="card-body">
-               <div style="display: flex; flex-direction: column; align-items: center;">
-                  <img src="/static/img/undraw_file_searching_re_3evy.svg" width="180" height="180">
-                  <p>***Descrição intuitiva para explicar o campo de consulta de preços aos representantes</p>
-               </div>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end;">
-               <a href="/consulta"><button class="btn btn-info">Consultar</button></a>
-            </div>
-         </div>
-      </div>
-   </div>
 
    <div class="row">
-      <div class="col-md-6 mb-3">
-         <div class="card shadow mb-4">
-            <div class="card-header py-3">
-               <h6 class="m-0 font-weight-bold text-primary">Cadastrar Cliente</h6>
-            </div>
-            <div class="card-body">
-               <div style="display: flex; flex-direction: column; align-items: center;">
-                  <img src="/static/img/undraw_sign_up_n6im.svg" width="180" height="180">
-                  <p>***Descrição intuitiva para explicar o campo de cadastrar cliente aos representantes</p>
-               </div>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end;">
-               <button class="btn btn-primary" name="Cadastrar" id="modal-cadastrar-cliente">Cadastrar</button>
-            </div>
-         </div>
+      <div class="col-xl-3 col-md-12 mb-4">
+          <div class="card">
+              <div class="card-body">
+                  <div class="d-flex justify-content-between p-md-1">
+                      <div class="d-flex flex-row">
+                          <div class="align-self-center">
+                              <!-- <i class="fas fa-pencil-alt text-info fa-3x me-4"></i> -->
+                          </div>
+                          <div>
+                              <h4>Pendentes</h4>
+                              <!-- <p class="mb-0">Monthly blog posts</p> -->
+                          </div>
+                      </div>
+                      <div class="align-self-center">
+                          <h2 class="h1 mb-0" id="pendentes-count">-</h2>
+                      </div>
+                  </div>
+              </div>
+          </div>
       </div>
-      <div class="col-md-6 mb-3">
-         <div class="card shadow mb-4">
-            <div class="card-header py-3">
-               <h6 class="m-0 font-weight-bold" style="color: #e74a3b;">Interações</h6>
-            </div>
-            <div class="card-body">
-               <div style="display: flex; flex-direction: column; align-items: center;">
-                  <img src="/static/img/undraw_social_interaction_re_dyjh.svg" width="180" height="180">
-                  <p>***Descrição intuitiva para explicar o campo de interações aos representantes</p>
-               </div>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end;">
-               <button class="btn btn-danger" name="Interações" id="botao-modal-interacao">Interações</button>
-            </div>
-         </div>
+      <div class="col-xl-3 col-md-12 mb-4">
+          <div class="card">
+              <div class="card-body">
+                  <div class="d-flex justify-content-between p-md-1">
+                      <div class="d-flex flex-row">
+                          <div class="align-self-center">
+                              <!-- <i class="fas fa-pencil-alt text-info fa-3x me-4"></i> -->
+                          </div>
+                          <div>
+                              <h4>Ganhas no Mês Atual</h4>
+                              <!-- <p class="mb-0">Monthly blog posts</p> -->
+                          </div>
+                      </div>
+                      <div class="align-self-center">
+                          <h2 class="h1 mb-0" id="ganhas-count">-</h2>
+                      </div>
+                  </div>
+              </div>
+          </div>
       </div>
-   </div>
+      <div class="col-xl-3 col-md-12 mb-4">
+          <div class="card">
+              <div class="card-body">
+                  <div class="d-flex justify-content-between p-md-1">
+                      <div class="d-flex flex-row">
+                          <div class="align-self-center">
+                              <!-- <i class="fas fa-pencil-alt text-info fa-3x me-4"></i> -->
+                          </div>
+                          <div>
+                              <h4>Perdidas no Mês Atual</h4>
+                              <!-- <p class="mb-0">Monthly blog posts</p> -->
+                          </div>
+                      </div>
+                      <div class="align-self-center">
+                          <h2 class="h1 mb-0" id="perdidas-count">-</h2>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
 
    <div class="row">
-      <div class="col-md-6 mb-3">
-         <div class="card shadow mb-4">
-            <div class="card-header py-3">
-               <h6 class="m-0 font-weight-bold" style="color: #1cc88a;">Pedidos de Clientes</h6>
-            </div>
-            <div class="card-body">
-               <div class="table-responsive">
-                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                      <thead>
-                          <tr>
-                              <th>Name</th>
-                              <th>Position</th>
-                              <th>Office</th>
-                              <th>Age</th>
-                              <th>Start date</th>
-                              <th>Salary</th>
-                          </tr>
-                      </thead>
-                      <tfoot>
-                          <tr>
-                              <th>Name</th>
-                              <th>Position</th>
-                              <th>Office</th>
-                              <th>Age</th>
-                              <th>Start date</th>
-                              <th>Salary</th>
-                          </tr>
-                      </tfoot>
-                      <tbody>
-                          <tr>
-                              <td>Tiger Nixon</td>
-                              <td>System Architect</td>
-                              <td>Edinburgh</td>
-                              <td>61</td>
-                              <td>2011/04/25</td>
-                              <td>$320,800</td>
-                          </tr>
-                          <tr>
-                              <td>Garrett Winters</td>
-                              <td>Accountant</td>
-                              <td>Tokyo</td>
-                              <td>63</td>
-                              <td>2011/07/25</td>
-                              <td>$170,750</td>
-                          </tr>
-                          <tr>
-                              <td>Ashton Cox</td>
-                              <td>Junior Technical Author</td>
-                              <td>San Francisco</td>
-                              <td>66</td>
-                              <td>2009/01/12</td>
-                              <td>$86,000</td>
-                          </tr>
-                          <tr>
-                              <td>Cedric Kelly</td>
-                              <td>Senior Javascript Developer</td>
-                              <td>Edinburgh</td>
-                              <td>22</td>
-                              <td>2012/03/29</td>
-                              <td>$433,060</td>
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-              ***Descrição intuitiva para explicar o campo de <code>pedidos</code> aos representantes</p>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end; align-items: center;">
-               <button class="btn btn-success" name="pedidos" id="pedidos-ganhos">Exibir Pedidos</button>
-            </div>
-         </div>
-      </div>
-      <div class="col-md-6 mb-3">
-         <div class="card shadow mb-4">
-            <div class="card-header py-3">
-               <h6 class="m-0 font-weight-bold text-secondary">Pedidos em andamento</h6>
-            </div>
-            <div class="card-body">
-               <div class="table-responsive">
-                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                      <thead>
-                          <tr>
-                              <th>Name</th>
-                              <th>Position</th>
-                              <th>Office</th>
-                              <th>Age</th>
-                              <th>Start date</th>
-                              <th>Salary</th>
-                          </tr>
-                      </thead>
-                      <tfoot>
-                          <tr>
-                              <th>Name</th>
-                              <th>Position</th>
-                              <th>Office</th>
-                              <th>Age</th>
-                              <th>Start date</th>
-                              <th>Salary</th>
-                          </tr>
-                      </tfoot>
-                      <tbody>
-                          <tr>
-                              <td>Tiger Nixon</td>
-                              <td>System Architect</td>
-                              <td>Edinburgh</td>
-                              <td>61</td>
-                              <td>2011/04/25</td>
-                              <td>$320,800</td>
-                          </tr>
-                          <tr>
-                              <td>Garrett Winters</td>
-                              <td>Accountant</td>
-                              <td>Tokyo</td>
-                              <td>63</td>
-                              <td>2011/07/25</td>
-                              <td>$170,750</td>
-                          </tr>
-                          <tr>
-                              <td>Ashton Cox</td>
-                              <td>Junior Technical Author</td>
-                              <td>San Francisco</td>
-                              <td>66</td>
-                              <td>2009/01/12</td>
-                              <td>$86,000</td>
-                          </tr>
-                          <tr>
-                              <td>Cedric Kelly</td>
-                              <td>Senior Javascript Developer</td>
-                              <td>Edinburgh</td>
-                              <td>22</td>
-                              <td>2012/03/29</td>
-                              <td>$433,060</td>
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-              ***Descrição intuitiva para explicar o campo de <code>pedidos em andamento</code> aos representantes</p>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end;">
-               <button class="btn btn-secondary" name="pedidos" id="pedidos-ganhos">Em andamento</button>
-            </div>
-         </div>
-      </div>
+      {% include 'tabelas/tb-pedidos-andamento.html' %}
    </div>
+
+   <!-- Modals -->
+   {% include 'modals/add-contatos.html' %}
+   {% include 'modals/perder.html' %}
+
+   <!-- Alerts -->
+   {% include 'alertas/alerta-sucesso.html' %}
+
 </div>
 
 <div class="container pt-4" style="transition: 0.5s; max-width: 1440px;">
@@ -251,98 +122,113 @@
       </div>
    </div> -->
 
-      <div class="modal fade" id="modalPerder" data-bs-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="modalPerderLabel">
-         <div class="modal-dialog" role="document">
-            <div class="modal-content">
-               <div class="modal-header">
-                  <h5 class="modal-title" id="modalPerderLabel">Perder proposta</h5>
-                  <button type="button" class="close" aria-label="Fechar">
-                     <span aria-hidden="true">&times;</span>
-                  </button>
-               </div>
-               <div class="modal-body-perder">
-                  <!-- Conteúdo será preenchido dinamicamente usando JavaScript -->
-               </div>
+   <div class="modal fade" id="modalPerder" data-bs-backdrop="static"
+      tabindex="-1" role="dialog"
+      aria-labelledby="modalPerderLabel">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="modalPerderLabel">Perder
+                  proposta</h5>
+               <button type="button" class="close" aria-label="Fechar">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body-perder">
+               <!-- Conteúdo será preenchido dinamicamente usando JavaScript -->
             </div>
          </div>
       </div>
+   </div>
 
-      <div class="modal fade" id="modalSimNao" data-bs-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="modalSimNaoLabel">
-         <div class="modal-dialog" role="document">
-            <div class="modal-content">
-               <div class="modal-body" id="modal-body-simNao">
-                  <!-- Conteúdo do Modal Sim ou Nao -->
-               </div>
+   <div class="modal fade" id="modalSimNao" data-bs-backdrop="static"
+      tabindex="-1" role="dialog"
+      aria-labelledby="modalSimNaoLabel">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-body" id="modal-body-simNao">
+               <!-- Conteúdo do Modal Sim ou Nao -->
             </div>
          </div>
       </div>
+   </div>
 
-      <div class="modal fade" id="modalInteracao" data-bs-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="modalInteracaoLabel">
-         <div class="modal-dialog" role="document">
-            <div class="modal-content">
-               <div class="modal-body">
-                  <div class="cadastrar-cliente-interação">
-                     <label>Empresa: </label>
-                     <input type="text" class="form-control" id="empresa_registrar" placeholder="Empresa" autocomplete="off">
-                  </div>
-                  <div class="suggestions" id="suggestionsEmpresasRegistrar">
-
-                  </div>
-                  <div style="display:none">
-                     <div style="display:flex;flex-direction:column;margin-top:20px;gap: 3px;">
-                        <label>Registro: </label>
-                        <textarea id="campo-texto" class="form-control" placeholder="Digite aqui..."></textarea>
-                        <i style="cursor:pointer" id="arrow" class="fa-solid fa-angle-down"></i>
-                     </div>
-                     <div style="display: flex;justify-content: flex-end;align-items: center;color:gray; gap: 5px; margin-top: 10px;">
-                        <label>Campos não obrigatório</label>
-                        <i style="cursor:pointer" id="arrow" class="fa-solid fa-angle-down"></i>
-                     </div>
-                  </div>
+   <div class="modal fade" id="modalInteracao" data-bs-backdrop="static"
+      tabindex="-1" role="dialog"
+      aria-labelledby="modalInteracaoLabel">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-body">
+               <div class="cadastrar-cliente-interação">
+                  <label>Empresa: </label>
+                  <input type="text" class="form-control" id="empresa_registrar"
+                     placeholder="Empresa" autocomplete="off">
                </div>
-            </div>
-         </div>
-      </div>
+               <div class="suggestions" id="suggestionsEmpresasRegistrar">
 
-      <div class="modal fade" id="modalGanhar" data-bs-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="modalGanharLabel" aria-hidden="true">
-         <div class="modal-dialog" role="document">
-            <div class="modal-content">
-               <div class="modal-body">
-                  <!-- Conteúdo do Modal Ganhar -->
                </div>
-            </div>
-         </div>
-      </div>
-
-      <div class="modal fade" id="modalPedidos" data-bs-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="modalPedidosLabel" aria-hidden="true">
-         <div class="modal-dialog" role="document">
-            <div class="modal-content">
-               <div class="modal-header">
-                  <h5 class="modal-title" id="modalGanharLabel">Pedidos</h5>
-                  <button type="button" class="close" aria-label="Fechar" style="margin: 10px;">
-                     <span aria-hidden="true">&times;</span>
-                  </button>
-               </div>
-               <div class="modal-body">
-                  <div class="col-md-6 mb-3">
-                     <button class="btn btn-info" id="carregarPedidos" style="width: 200px;">Carregar Pedidos </button>
+               <div style="display:none">
+                  <div
+                     style="display:flex;flex-direction:column;margin-top:20px;gap: 3px;">
+                     <label>Registro: </label>
+                     <textarea id="campo-texto" class="form-control"
+                        placeholder="Digite aqui..."></textarea>
+                     <i style="cursor:pointer" id="arrow"
+                        class="fa-solid fa-angle-down"></i>
                   </div>
-                  <div class="row" id="cadastrar-pedido">
-                     
+                  <div
+                     style="display: flex;justify-content: flex-end;align-items: center;color:gray; gap: 5px; margin-top: 10px;">
+                     <label>Campos não obrigatório</label>
+                     <i style="cursor:pointer" id="arrow"
+                        class="fa-solid fa-angle-down"></i>
                   </div>
                </div>
             </div>
          </div>
       </div>
+   </div>
+
+   <div class="modal fade" id="modalGanhar" data-bs-backdrop="static"
+      tabindex="-1" role="dialog"
+      aria-labelledby="modalGanharLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-body">
+               <!-- Conteúdo do Modal Ganhar -->
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div class="modal fade" id="modalPedidos" data-bs-backdrop="static"
+      tabindex="-1" role="dialog"
+      aria-labelledby="modalPedidosLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="modalGanharLabel">Pedidos</h5>
+               <button type="button" class="close" aria-label="Fechar"
+                  style="margin: 10px;">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="col-md-6 mb-3">
+                  <button class="btn btn-info" id="carregarPedidos"
+                     style="width: 200px;">Carregar Pedidos </button>
+               </div>
+               <div class="row" id="cadastrar-pedido">
+
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
 
 </div>
 
-<div id="success-message" class="alert alert-success top-message slide-in" style="display: none;">
+<div id="success-message" class="alert alert-success top-message slide-in"
+   style="display: none;">
    Ação bem-sucedida! Sua mensagem de sucesso aqui.
 </div>
 
@@ -354,19 +240,22 @@
 
 {% block scripts %}
 
-<script src="/static/js/buscando_api.js"></script>
+<!-- <script src="/static/js/buscando_api.js"></script>
 <script src="/static/js/envios.js"></script>
-<script src="/static/js/modal.js"></script>
+<script src="/static/js/modal.js"></script> -->
 <script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
 <script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
+<script src="static/js/cards-home/api-cards.js"></script>
+
 <!-- Plugin icons -->
-<script src="https://kit.fontawesome.com/d1807a784c.js" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/d1807a784c.js"
+   crossorigin="anonymous"></script>
 
 <!-- script com a construção das tabelas -->
 <script src="static/js/demo/datatables-demo.js"></script>
 
-<script>
+<!-- <script>
    function botaoAdicionarContato(){
       // Ao clicar no botão "plus"
       var campo_input = $(".campo_input");
@@ -723,6 +612,6 @@
       $('#modalGanhar').modal('hide');
    });
 
-</script>
+</script> -->
 
 {% endblock %}

@@ -1,0 +1,114 @@
+<link src="/static/css/alertas/loading.css"></link>
+
+<div class="col-md-2 mb-3">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold" style="color: #1cc88a;">Filtros</h6>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <label for="statusFilter">Status</label>
+                    <select class="form-control" name="statusFilter" id="statusFilter">
+                        <option value=""></option>
+                        <option value="2">Ganha</option>
+                        <option value="1">Em aberto</option>
+                        <option value="3">Perdida</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <label for="revendaFilter">Revenda</label>
+                    <input class="form-control" type="text" name="revendaFilter" id="revendaFilter" autocomplete="off">
+                </div>
+            </div>
+            <!-- <div class="row mb-4">
+                <div class="col-sm-12">
+                    <label for="dataPropostaFilter">Data da proposta</label>
+                    <input class="form-control" type="date" name="dataPropostaFilter" id="dataPropostaFilter">
+                </div> -->
+            <!-- </div> -->
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <label for="aceiteExternoFilter">Aceite externo</label>
+                    <select class="form-control" name="aceiteExternoFilter" id="aceiteExternoFilter">
+                        <option value=""></option>
+                        <option value="true">Aceito</option>
+                        <option value="null">Aguardando</option>
+                        <option value="false">Recusado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <label for="aprovacaoDescontoFilter">Aprovação de desconto</label>
+                    <select class="form-control" name="aprovacaoDescontoFilter" id="aprovacaoDescontoFilter">
+                        <option value=""></option>
+                        <option value="2">Aprovado</option>
+                        <option value="null">N/A</option>
+                        <option value="1">Aguardando</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-primary" id="filterTablePropostas">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+                </svg>
+                Filtrar
+              </button>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-10 mb-3">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold" style="color: #1cc88a;">Pedidos de Clientes</h6>
+        </div>
+        <div class="card-body" style="min-height: 300px; max-height: 700px; overflow-y: auto;" id="cardPropostas">
+            {% include 'alertas/loading.html' %}
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div id="no-more-tables">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tablePropostaAndamento" width="100%" cellspacing="0">
+                                <thead class="cf">
+                                    <tr>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Revenda</th>
+                                        <th scope="col">Valor da proposta</th>
+                                        <th scope="col">Data da proposta</th>
+                                        <th scope="col">Aceite (externo)</th>
+                                        <th scope="col">Aprovação de desconto</th>
+                                        <th scope="col">Links</th>
+                                        <th scope="col">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyTablePropostaAndamento">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         ***Descrição intuitiva para explicar o campo de <code>pedidos</code> aos representantes</p>
+        </div>
+        <div class="card-footer" id="footer-table" style="display: flex; justify-content: flex-end; align-items: center;">
+        </div>
+    </div>
+</div> 
+
+<script src="/static/js/pedidos-andamento.js"></script>
+<script src="/static/js/botoes_tela_inicial/add-contatos.js"></script>
+<script src="/static/js/botoes_tela_inicial/popular-lista-contatos.js"></script>
+<script src="/static/js/botoes_tela_inicial/popular-lista-motivos.js"></script>
+<script src="/static/js/botoes_tela_inicial/ganhar.js"></script>
+<script src="/static/js/botoes_tela_inicial/perder.js"></script>
+<script src="/static/js/botoes_tela_inicial/botao_revisar.js"></script>
+<script src="/static/js/botoes_tela_inicial/revisar.js"></script>
+
+<script src="/static/js/alertas/loading.js"></script>

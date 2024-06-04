@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/alertas/loading.css') }}">
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/dropdown/contato-gerar-proposta.css') }}">
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/alertas/alerta-sucesso.css') }}">
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/no-more-table.css') }}">
+
+{% endblock %}
+
+{% block container %}
+
+<div id="tabela-itens-gerar-proposta">
+
+    <!-- Table -->
+    {% include 'tabelas/tb-itens-gerar-proposta.html' %}
+
+</div>
+
+<!-- Alerts -->
+{% include 'alertas/loading.html' %}
+{% include 'alertas/alerta-sucesso.html' %}
+
+<!-- Modals -->
+{% include 'modals/carrinho.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="/static/js/consultar-preco/itens-gerar-proposta.js"></script>
+<script src="/static/js/consultar-preco/abrir-carrinho.js"></script>
+<script src="/static/js/gerar-proposta/botao-enviar-para-carrinho.js"></script>
+<script src="/static/js/gerar-proposta/enviar-gerar-proposta.js"></script>
+<script src="/static/js/dropdown/contato-gerar-proposta.js"></script>
+<script src="/static/js/dropdown/buscar-contatos-gerar-proposta.js"></script>
+<script src="/static/js/dropdown/formas-pagamento.js"></script>
+<script src="/static/js/alertas/loading.js"></script>
+<script src="/static/js/alertas/alerta-sucesso.js"></script>
+<script src="/static/js/botoes_tela_inicial/botao_revisar.js"></script>
+
+{% endblock %}

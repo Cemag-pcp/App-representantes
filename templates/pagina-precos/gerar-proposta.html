@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/alertas/loading.css') }}">
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/dropdown/contato-gerar-proposta.css') }}">
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/alertas/alerta-sucesso.css') }}">
+<link rel="stylesheet" type="text/css"
+    href="{{ url_for('static', filename='css/no-more-table.css') }}">
+
+{% endblock %}
+
+{% block container %}
+<div class="col-md-12 mb-3">
+    <div class="card shadow mb-4">
+        <!-- <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold" style="color:#ffa171;">Gerar
+                proposta</h6>
+            
+            <button id="abrirCarrinho" data-toggle="modal" data-target="#modalCarrinho">Carrinho de compra</button>
+        </div> -->
+        <div
+            class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold" style="color:#ffa171;">Gerar
+                proposta</h6>
+
+            <!-- <button id="abrirCarrinho" class="btn btn-link" data-toggle="modal"
+                data-target="#modalCarrinho">
+                <i class="fas fa-shopping-cart"></i>
+            </button> -->
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-sm-3">
+                    <label for="nomeGerarProposta">Nome <small><strong>(obrigatório)</strong></small>:</label>
+                    <input class="form-control" type="text"
+                        id="nomeGerarProposta" autocomplete="off">
+                    <ul id="suggestionsPecas"
+                        class="custom-dropdown-menu"
+                        style="max-height: 100px; overflow-y: auto;"></ul>
+                </div>
+                <div class="col-sm-3">
+                    <label for>Contato <small><strong>(opcional)</strong></small>:</label>
+                    <input id="contatoGerarProposta" class="form-control"
+                        type="text" autocomplete="off">
+                    <ul id="suggestionsContatos"
+                        class="custom-dropdown-menu"
+                        style="max-height: 100px; overflow-y: auto;"></ul>
+                </div>
+                <div class="col-sm-3">
+                    <label for="inputFormaPagamento">Pagamento <small><strong>(obrigatório)</strong></small>:</label>
+                    <div class="position-relative">
+                        <input class="form-control" type="text"
+                            id="inputFormaPagamento" autocomplete="off">
+                        <ul id="suggestionsFormaPagamento"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                </div>
+                <div style="display: none;" class="col-sm-3">
+                    <label for>Responsável</label>
+                    <input id="responsavelGerarProposta" class="form-control"
+                        type="text">
+                </div>
+            </div>
+        </div>
+        <div class="card-footer"
+            style="display: flex; justify-content: flex-end;">
+            <button id="continuarGerarProposta"
+                class="btn btn-primary">Continuar</button>
+        </div>
+    </div>
+</div>
+
+<div id="tabela-itens-gerar-proposta" style="display: none;">
+
+    <!-- Table -->
+    {% include 'tabelas/tb-itens-gerar-proposta.html' %}
+
+</div>
+
+<!-- Alerts -->
+{% include 'alertas/loading.html' %}
+{% include 'alertas/alerta-sucesso.html' %}
+
+<!-- Modals -->
+{% include 'modals/carrinho.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="/static/js/gerar-proposta/itens-gerar-proposta.js"></script>
+<script src="/static/js/alertas/loading.js"></script>
+<script src="/static/js/dropdown/contato-gerar-proposta.js"></script>
+<script src="/static/js/dropdown/buscar-contatos-gerar-proposta.js"></script>
+<script src="/static/js/dropdown/formas-pagamento.js"></script>
+<script src="/static/js/gerar-proposta/botao-enviar-para-carrinho.js"></script>
+<script src="/static/js/gerar-proposta/abrir-carrinho.js"></script>
+<script src="/static/js/alertas/alerta-sucesso.js"></script>
+<script src="/static/js/gerar-proposta/enviar-gerar-proposta.js"></script>
+<script src="/static/js/botoes_tela_inicial/revisar.js"></script>
+
+{% endblock %}

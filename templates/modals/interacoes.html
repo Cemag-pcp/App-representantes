@@ -1,0 +1,84 @@
+<!-- Modal escolha o que cadastrar -->
+<div class="modal fade" id="modalInteracoes" data-backdrop="static"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitlemodalInteracoes" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Interações</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-sm-12">
+                        <label for="empresaCadastradaInteracao">Empresa
+                            <small><strong>(obrigatório)</strong></small>:</label>
+                        <input class="form-control" type="text"
+                            id="empresaCadastradaInteracao2" autocomplete="off">
+                        <ul id="suggestionsPecasInteracao2"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-12">
+                        <label for="registroTextArea">Registro
+                            <small><strong>(obrigatório)</strong></small>:</label>
+                        <textarea class="form-control"
+                            name="nameRegistroTextArea" id="idRegistroTextArea"
+                            cols="30" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="accordion" id="accordionExample">
+                            <div class="card">
+                                <div class="card-header" id="headingOne">
+                                    <h2 class="mb-0">
+                                        <button class="btn btn-link"
+                                            type="button" data-toggle="collapse"
+                                            data-target="#collapseOne"
+                                            aria-expanded="false"
+                                            aria-controls="collapseOne">
+                                            Campos não obrigatório <i
+                                                class="arrow fas fa-chevron-down"></i>
+                                        </button>
+                                    </h2>
+                                </div>
+                                <div id="collapseOne" class="collapse"
+                                    aria-labelledby="headingOne"
+                                    data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-sm-6">
+                                                <label
+                                                    for="dataInteracao">Data</label>
+                                                <input class="form-control"
+                                                    type="date"
+                                                    id="dataInteracao">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="contatoInteracao">Contato</label>
+                                                <select id="contatoGerarProposta" class="form-control">
+                                                    <option></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="enviarInteracao"
+                    class="btn btn-success">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>

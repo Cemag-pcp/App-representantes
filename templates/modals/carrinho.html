@@ -1,0 +1,157 @@
+<!-- Modal -->
+<div class="modal fade" id="modalCarrinho" data-backdrop="static" tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitleModalCarrinho" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Carrinho</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body-carrinho" style="max-height: 700px; overflow-y: auto;">
+
+            </div>
+            <div
+                class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <label for="valorTotal">Total</label>
+                    <input class="form-control" type="text"
+                        id="valorTotalCarrinho" disabled>
+                </div>
+                <div style="align-self: self-end;">
+                    <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modalContinuarConfirmacao" data-dismiss="modal"
+                        id="continuarConfirmacao" style="display: none;">Continuar
+                    </button>
+                    <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modalContinuarConsultaPreco" data-dismiss="modal"
+                        id="continuarConfirmacaoConsulta" style="display: none;">Continuar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal continuar -->
+<div class="modal fade" id="modalContinuarConfirmacao" data-backdrop="static" tabindex="-1"
+    role="dialog"
+    aria-labelledby="labelTitlemodalContinuarConfirmacao" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmação</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body-continuar" style="max-height: 700px; overflow-y: auto;">
+
+            </div>
+            <div
+                class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <button class="btn btn-warning" data-toggle="modal"
+                    data-target="#modalCarrinho" data-dismiss="modal">Voltar
+                </button>
+                <button data-dismiss="modal" aria-label="Close"
+                    type="button"
+                    class="btn btn-success"
+                    id="confirmarGerarProposta">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal continuar consulta de preço -->
+<div class="modal fade" id="modalContinuarConsultaPreco" data-backdrop="static"
+    tabindex="-1" role="dialog"
+    aria-labelledby="labelTitleModalContinuarConsultaPreco" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmação</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 700px; overflow-y: auto;">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <label for="nomeGerarProposta">Nome</label>
+
+                        {% if dadosProposta[0] %}
+                        <input class="form-control" type="text"
+                            id="nomeGerarProposta" autocomplete="off" data-id="{{dadosProposta[1]}}" value="{{dadosProposta[0]}}" disabled>
+                        {% else %}
+                        <input class="form-control" type="text"
+                            id="nomeGerarProposta" autocomplete="off">
+                        {% endif %}
+
+                        <ul id="suggestionsPecas"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for>Contato</label>
+                        <input id="contatoGerarProposta"
+                            class="form-control"
+                            type="text" autocomplete="off" data-id="{{dadosProposta[3]}}" value="{{dadosProposta[2]}}">
+                        <ul id="suggestionsContatos"
+                            class="custom-dropdown-menu"
+                            style="max-height: 100px; overflow-y: auto;"></ul>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <label for="inputFormaPagamento">Pagamento</label>
+                        <div class="position-relative">
+                            <input class="form-control" type="text"
+                                id="inputFormaPagamento" autocomplete="off" value="{{dadosProposta[4]}}">
+                            <ul id="suggestionsFormaPagamento"
+                                class="custom-dropdown-menu"
+                                style="max-height: 100px; overflow-y: auto;"></ul>
+                        </div>
+                    </div>
+                    <!-- <div class="col-sm-6">
+                        <label for>Responsável</label>
+                        <input id="responsavelGerarProposta"
+                            class="form-control"
+                            type="text">
+                    </div> -->
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <label for="observacaoGerarPropostaCarrinho">Observação<small> (opcional)</small>:</label>
+                        {% if dadosProposta %}
+                        <textarea class="form-control" name="observacaoGerarPropostaCarrinho" id="observacaoGerarPropostaCarrinho" cols="5" rows="5">{{dadosProposta[6].replace("<p>","").replace("</p>","")}}</textarea>
+                        {% else %}
+                        <textarea class="form-control" name="observacaoGerarPropostaCarrinho" id="observacaoGerarPropostaCarrinho" cols="5" rows="5"></textarea>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div
+                class="modal-footer py-3 d-flex justify-content-between align-items-center">
+                <button class="btn btn-warning" data-toggle="modal"
+                    data-target="#modalCarrinho" data-dismiss="modal">Voltar
+                </button>
+                {% if not dadosProposta[0] %}
+                <button data-dismiss="modal" aria-label="Close"
+                    type="button"
+                    class="btn btn-success"
+                    id="confirmarGerarProposta_2">Confirmar</button>
+                {% else %}
+                <button data-dismiss="modal" aria-label="Close"
+                    type="button"
+                    class="btn btn-success"
+                    id="confirmarGerarProposta_revisar">Confirmar 2</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

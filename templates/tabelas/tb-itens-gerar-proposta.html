@@ -1,0 +1,131 @@
+<div class="col-md-12 mb-3">
+    
+    {% if lista_preco_cliente %}
+    <input style="display: none;" id="revisarProposta" type="text" value="{{lista_preco_cliente}}">
+    {% else %}
+    <input style="display: none;" id="revisarProposta" type="text" value="">
+    {% endif %}
+
+    {% if quoteId %}
+    <input style="display: none;" id="quoteId" type="text" value="{{quoteId}}">
+    {% else %}
+    <input style="display: none;" id="quoteId" type="text" value="">
+    {% endif %}
+
+    {% if dealId %}
+    <input style="display: none;" id="dealId" type="text" value="{{dealId}}">
+    {% else %}
+    <input style="display: none;" id="dealId" type="text" value="">
+    {% endif %}
+    
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-12 mb-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6
+                        class="m-0 font-weight-bold text-secondary">Filtros</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-sm-2">
+                            <label for>Categoria</label>
+                            <select class="form-control" name="nameDescricao"
+                                id="idDescricao">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Modelo</label>
+                            <select class="form-control" name="nameModelo"
+                                id="idModelo">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Eixo</label>
+                            <select class="form-control" name="nameEixo"
+                                id="idEixo">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Mola Freio</label>
+                            <select class="form-control" name="nameMolaFreio"
+                                id="idMolaFreio">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Tamanho</label>
+                            <select class="form-control" name="nameTamanho"
+                                id="idTamanho">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Rodado</label>
+                            <select class="form-control" name="nameRodado"
+                                id="idRodado">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-sm-2">
+                            <label for>Pneu</label>
+                            <select class="form-control" name="namePneu"
+                                id="idPneu">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Opcionais</label>
+                            <select class="form-control" name="nameOpcionais"
+                                id="idOpcionais">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for>Lista de preço</label>
+                            <select class="form-control" name="nameListas"
+                                id="idListasPreco">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tabela -->
+    <div class="row mb-4">
+        <div class="col-md-12 mb-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">Produtos</h6>
+                </div>
+                <div class="card-body" id="card-table-gerar-proposta" style="max-height: 700px; overflow-y: auto;">
+                    <div id="no-more-tables">
+                        <div class="table-responsive">
+                            <table class="table table-bordered"
+                                id="tableGerarProposta"
+                                width="100%" cellspacing="0">
+                                <thead class="cf">
+                                    <tr>
+                                        <th>Família</th>
+                                        <th>Código</th>
+                                        <th style="width: 20%;">Descrição</th>
+                                        <th>Cor</th>
+                                        <th>Preço</th>
+                                        <th>Desconto</th>
+                                        <th>Preço c/ desc.</th>
+                                        <th>Favorito</th>
+                                        <th>Escolher</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyTabelaGerarProposta">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
