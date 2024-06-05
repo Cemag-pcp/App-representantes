@@ -138,7 +138,7 @@ function construirTabelaGerarProposta(data, representante) {
                 </div>
             </td>
             <td data-title="Selec." data-label="Selecionar">
-                <button class="botao-enviar-carrinho btn btn-primary btn-sm" id="botão_enviar_carrinho"><i class="fa-sharp fa-solid fa-paper-plane"></i>   Enviar</button>
+                <button class="botao-enviar-carrinho btn btn-primary btn-sm" id="botão_enviar_carrinho">Enviar</button>
             </td>
         `;
 

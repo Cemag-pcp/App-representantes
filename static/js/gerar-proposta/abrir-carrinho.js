@@ -26,7 +26,7 @@ function getCarrinho() {
 
             for (var i = 0; i < data.data.length; i++) {
                 var item = data.data[i];
-                preencherModalProduto(item[0], item[1], item[2], 1, item[3], item[5], item[7]);
+                preencherModalProduto(item[0], item[1], item[2], item[6], item[3], item[5], item[7], item[8]);
             };
 
             preencherTotal();
@@ -76,7 +76,7 @@ btAbrirCarrinho.addEventListener('click', function () {
 });
 
 // Função para preencher o modal com os dados fornecidos
-function preencherModalProduto(id, produto, cor, quantidade, preco, precoInicial, desconto) {
+function preencherModalProduto(id, produto, cor, quantidade, preco, precoInicial, desconto, descricao_carreta) {
 
     // Cria um novo elemento de div para representar uma linha no modal
     var rowDiv = document.createElement('div');
@@ -107,6 +107,19 @@ function preencherModalProduto(id, produto, cor, quantidade, preco, precoInicial
 
     // Adiciona os elementos à coluna de produto
     colDivDesconto.appendChild(desconto);
+
+    var coldDivDescricaoCarreta = document.createElement('div');
+    coldDivDescricaoCarreta.classList.add('col-md-1');
+
+    var descricaoCarretaElement = document.createElement('input');
+    descricaoCarretaElement.setAttribute('id', 'descricao-carreta');
+    descricaoCarretaElement.setAttribute('type', 'text');
+    descricaoCarretaElement.setAttribute('class', 'form-control');
+    descricaoCarretaElement.setAttribute('value', descricao_carreta);
+    descricaoCarretaElement.style.display = 'none';
+
+    // Adiciona os elementos à coluna de produto
+    coldDivDescricaoCarreta.appendChild(descricaoCarretaElement);
 
     // Adiciona os elementos de input e labels para cada campo do produto
     var colDivProduto = document.createElement('div');
@@ -225,6 +238,7 @@ function preencherModalProduto(id, produto, cor, quantidade, preco, precoInicial
     rowDiv.appendChild(colDivId);
     rowDiv.appendChild(colDivPrecoInicial);
     rowDiv.appendChild(colDivDesconto);
+    rowDiv.appendChild(coldDivDescricaoCarreta);
 
     // Adiciona a linha preenchida ao modal
     modalBody.appendChild(rowDiv);

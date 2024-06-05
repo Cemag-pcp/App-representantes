@@ -38,10 +38,13 @@ function handleClick() {
         'nomeCliente': idCliente.value,
         'idCliente': idCliente.dataset.id,
         'idContato': idContato.dataset.id,
+        'nomeContato':idContato.value,
         'formaPagamento': formaPagamentoText.value,
         'listaProdutos': listaProdutos,
         'observacao': observacao
     }
+
+    copiarItensETotalParaAreaDeTransferencia();
 
     gerarProposta(data);
 }
@@ -71,14 +74,15 @@ function gerarProposta(data) {
             if (!response.ok) {
                 throw new Error('Erro ao enviar a requisição POST');
             }
-            exibirMensagem('sucesso', 'Proposta aberta com sucesso.');
+            exibirMensagem('sucesso', 'Proposta aberta com sucesso. Itens copiados para área de transferência.');
             hideSpinner();
             return response.json(); // Se desejar, você pode tratar a resposta aqui
         })
         .then(data => {
             console.log('Requisição POST enviada com sucesso:', data);
-            exibirMensagem('sucesso', 'Proposta aberta com sucesso.');
+            exibirMensagem('sucesso', 'Proposta aberta com sucesso. Itens copiados para área de transferência.');
             hideSpinner();
+            
         })
         .catch(error => {
             console.error('Erro ao enviar a requisição POST:', error);
@@ -88,46 +92,27 @@ function gerarProposta(data) {
 };
 
 function copiarItensETotalParaAreaDeTransferencia() {
-    // Obtenha todos os itens da lista
-    const listItems = document.querySelectorAll('.listCard li');
+    var modalBody = document.getElementById('modal-body-carrinho');
+    var rows = modalBody.querySelectorAll('.row.mb-4');
+    var textToCopy = '';
+    var total = 0;
 
-    // Construa uma string com o conteúdo dos itens
-    let itensTexto = '';
-    listItems.forEach(listItem => {
-        const descricao = listItem.getAttribute('data-description');
-        const corElement = listItem.querySelector('.cor');
-        const cor = corElement.value;
-        const nomeCarreta = listItem.querySelector('.nomeCarreta').textContent;
-        const preco = listItem.querySelector('.quanti').textContent;
-        const quantidade = listItem.querySelector('.numeros').textContent;
-        const descricaoCarreta = listItem.querySelector('.descCarreta').textContent;
+    rows.forEach(function(row) {
+        var produto = row.querySelector('#produtoInput').value;
+        var descricao = row.querySelector('#descricao-carreta').value;
+        var cor = row.querySelector('#selectCor').value;
+        var quantidade = row.querySelector('.quantidadeItens').value;
+        var precoUnit = row.querySelector('.precoUnitItem').value;
+        
+        var subtotal = quantidade * precoUnit;
+        total += subtotal;
 
-        // Construa a string para cada item
-        itensTexto += `${nomeCarreta} - ${descricaoCarreta}\nCor: ${cor}\nPreço: ${preco}\nQuantidade: ${quantidade}\n\n`;
+        textToCopy += `Produto: ${produto}\nDescrição: ${descricao}\nCor: ${cor}\nQuantidade: ${quantidade}\nPreço unitário: ${precoUnit}\nSubtotal: ${subtotal}\n\n`;
     });
 
-    // Obtenha o valor do elemento HTML que contém o total
-    const total = document.querySelector('.total').textContent;
+    textToCopy += `Total: ${total}`;
 
-    // Adicione o total à string de itens
-    itensTexto += `Total: ${total}\n`;
-
-    // Crie um elemento de área de transferência temporário para copiar o texto
-    const tempInput = document.createElement('textarea');
-    tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
-    tempInput.value = itensTexto;
-    document.body.appendChild(tempInput);
-
-    // Seleciona o texto dentro do elemento de área de transferência
-    tempInput.select();
-    tempInput.setSelectionRange(0, 99999); // Para dispositivos móveis
-
-    // Executa o comando de cópia para copiar o texto selecionado
-    document.execCommand('copy');
-
-    // Remove o elemento de área de transferência temporário
-    document.body.removeChild(tempInput);
-
-    alert('Itens copiados para a área de transferência!\n');
-
+    navigator.clipboard.writeText(textToCopy).catch(function(err) {
+        console.error('Erro ao copiar para a área de transferência: ', err);
+    });
 }

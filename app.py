@@ -610,6 +610,7 @@ def adicionar_ao_carrinho():
     cor = car_data.get('cor')
     precoFinal = car_data.get('precoFinal')
     precoInicial = car_data.get('precoInicial')
+    descricao_carreta = car_data.get('descricao')
 
     precoFinal = float(precoFinal.replace("R$", "").replace(".", "").replace(",", "."))
     precoInicial = float(precoInicial.replace("R$", "").replace(".", "").replace(",", "."))
@@ -617,7 +618,7 @@ def adicionar_ao_carrinho():
     representante = session['user_id']
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute(
-        "INSERT INTO public.tb_carrinho_representante (codigo_carreta,cor,preco,representante,precoInicial,quantidade) VALUES (%s,%s,%s,%s,%s,%s)", (codigo,cor,precoFinal,representante,precoInicial,1))
+        "INSERT INTO public.tb_carrinho_representante (codigo_carreta,cor,preco,representante,precoInicial,quantidade,descricao_carreta) VALUES (%s,%s,%s,%s,%s,%s,%s)", (codigo,cor,precoFinal,representante,precoInicial,1,descricao_carreta))
 
     conn.commit()
 
@@ -1156,13 +1157,20 @@ def process_data():
     listaPreco = []
     listaPrecoUnitario = []
     listaPercentDesconto = []
-
+    listaContatos = []
+    listaObs = []
+    listaRep = []
+    listaFP = []
+    listaCliente = []
+    lista_id=[]
+    
     if 'idContato' in data:
         nomeContato = data['idContato']
     else:
         nomeContato = False
 
     produtos = data['listaProdutos']
+    unique_id = str(uuid.uuid4())  # Gerar id unico
 
     for produto in produtos:
         listaProdutos.append(produto['produto'])
@@ -1171,6 +1179,12 @@ def process_data():
         listaPreco.append(float(produto['preco'])*float(produto['quantidade']))
         listaPrecoUnitario.append(produto['preco'])
         listaPercentDesconto.append(round((float(produto['precoInicial']) - float(produto['preco'])) / float(produto['precoInicial']),4))
+        listaContatos.append(data['nomeContato'])
+        listaObs.append(data['observacao'])
+        listaRep.append(session['user_id'])
+        listaFP.append(data['formaPagamento'])
+        listaCliente.append(data['nomeCliente'])
+        lista_id.append(unique_id)
 
     deal_id = criarOrdem(data['nomeCliente'], data['idCliente'], nomeContato, session['user_id'])
 
@@ -1211,7 +1225,6 @@ def process_data():
     # except:
     #     pass
 
-    # unique_id = str(uuid.uuid4())  # Gerar id unico
 
     # # Crie um DataFrame a partir dos dados dos itens
     # df_items = pd.DataFrame(items)
@@ -1250,23 +1263,24 @@ def process_data():
     
     # criarProposta(df_items, descontoMaximo)
 
-    # query = """INSERT INTO tb_orcamento (id,nome_cliente,contato_cliente,forma_pagamento,observacoes,quantidade,preco_final,codigo,cor,representante) 
-    #             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+    query = """INSERT INTO tb_orcamento (id,nome_cliente,contato_cliente,forma_pagamento,observacoes,quantidade,preco_final,codigo,cor,representante) 
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 
-    # # Cria uma lista de tuplas contendo os valores das colunas do DataFrame
-    # valores = list(zip(df_items['id'], df_items['nome'], df_items['contato'], df_items['formaPagamento'], df_items['observacoes'],
-    #                    df_items['numeros'], df_items['quanti'], df_items['description'], df_items['cor'], df_items['representante'],
-    #                    ))
-
-    # # Abre uma transação explícita
-    # with conn:
-    #     # Cria um cursor dentro do contexto da transação
-    #     with conn.cursor() as cur:
-    #         # Executa a inserção das linhas usando executemany
-    #         cur.executemany(query, valores)
+    # Cria uma lista de tuplas contendo os valores das colunas do DataFrame
+    valores = list(zip(lista_id, listaCliente, listaContatos, listaFP, listaObs,
+                       listaQuantidade, listaPreco, listaProdutos, listaCores, listaRep,
+                       ))
     
-    # conn.commit()
-    # conn.close()
+
+    # Abre uma transação explícita
+    with conn:
+        # Cria um cursor dentro do contexto da transação
+        with conn.cursor() as cur:
+            # Executa a inserção das linhas usando executemany
+            cur.executemany(query, valores)
+    
+    conn.commit()
+    conn.close()
 
     # flash("Enviado com sucesso", 'success')
 

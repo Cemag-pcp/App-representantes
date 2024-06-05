@@ -23,6 +23,8 @@ document.addEventListener('click', function (event) {
         var celPrecoDesconto = row.querySelector('td[data-label="Preço Final"]');
         var inputPrecoDesconto = celPrecoDesconto.querySelector('input').value;
 
+        var descricao = cells[2].textContent;
+
         var precoFinal = inputPrecoDesconto;
 
         if (inputPrecoDesconto === '') {
@@ -34,6 +36,7 @@ document.addEventListener('click', function (event) {
             cor: corSelecionada,
             precoFinal: precoFinal,
             precoInicial:precoSelecionada,
+            descricao:descricao,
         };
 
         guardarCarrinho(data);
