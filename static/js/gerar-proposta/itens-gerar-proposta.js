@@ -265,33 +265,21 @@ document.getElementById('idOpcionais').addEventListener("change", atualizarTabel
 // Função para tratar caso o usuario altere o campo de desconto
 function updatePriceDesconto(event) {
     const descontoInput = event.target;
-    const row = descontoInput.closest('tr'); // Encontre a linha atual
-
-    // Encontre o valor selecionado no campo <select> de preço
+    const row = descontoInput.closest('tr');
     const selectPreco = row.querySelector('#preco');
     const precoSelecionadoTexto = selectPreco.value;
     const precoSelecionadoNumerico = parseFloat(precoSelecionadoTexto.replace(/[^\d,]/g, '').replace(',', '.'));
-
-    // Encontre o input onde o usuário insere o desconto
     const desconto = parseFloat(descontoInput.value);
-
-    // Encontre o input onde o preço final será exibido
     const precoFinalInput = row.querySelector('#precoFinal');
 
-    // Verifique se o desconto é um número válido e se o preço selecionado é válido
     if (!isNaN(desconto) && !isNaN(precoSelecionadoNumerico)) {
-        // Calcule o preço com desconto
-        const precoComDesconto = precoSelecionadoNumerico * (1 - desconto / 100);
-
-        // Formate o preço com desconto como uma moeda brasileira
+        const precoComDesconto = precoSelecionadoNumerico - (precoSelecionadoNumerico * (desconto / 100));
         const precoComDescontoFormatado = precoComDesconto.toLocaleString('pt-BR', {
             style: 'currency',
             currency: 'BRL',
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });
-
-        // Atualize o valor no input de preço final
         precoFinalInput.value = precoComDescontoFormatado;
     }
 }
@@ -299,31 +287,22 @@ function updatePriceDesconto(event) {
 // Função para tratar caso o usuario altere o campo de preco com desconto
 function updatePrice(event) {
     const descontoInput = event.target;
-    const row = descontoInput.closest('tr'); // Encontre a linha atual
-
-    // Encontre o valor selecionado no campo <select> de preço
+    const row = descontoInput.closest('tr');
     const selectPreco = row.querySelector('#preco');
     const precoSelecionadoTexto = selectPreco.value;
     const precoSelecionadoNumerico = parseFloat(precoSelecionadoTexto.replace(/[^\d,]/g, '').replace(',', '.'));
-
-    // Encontre o valor atual no campo de preço final
     const precoComDesconto = row.querySelector('#precoFinal').value;
 
-    // Verifique se o campo de preço com desconto está vazio
     if (precoComDesconto === '') {
-        // Se estiver vazio, limpe o campo de desconto e saia da função
         row.querySelector('#desconto').value = '';
         return;
     }
 
     const precoComDescontoNumerico = parseFloat(precoComDesconto.replace(/[^\d,]/g, '').replace(',', '.'));
 
-    // Verifique se o desconto é um número válido e se o preço selecionado é válido
     if (!isNaN(precoComDescontoNumerico)) {
-        // Calcule o desconto apenas se o campo de preço com desconto não estiver vazio
-        var descontoFormatado = Math.round(((precoComDescontoNumerico - precoSelecionadoNumerico / precoSelecionadoNumerico)) * 100, 2);
-
-        // Atualize o valor no campo de desconto
+        const desconto = ((precoSelecionadoNumerico - precoComDescontoNumerico) / precoSelecionadoNumerico) * 100;
+        const descontoFormatado = desconto.toFixed(2); // Arredonda para 2 casas decimais
         row.querySelector('#desconto').value = descontoFormatado;
     }
 }
