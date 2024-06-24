@@ -243,7 +243,7 @@ def atualizar_caches():
 #     try:
 #         df = df.merge(tb_favoritos, how='left', on='codigo')
 #     except:
-#         pass
+#         pass  
 
 #     regiao = buscarRegiaoCliente(nome_cliente)
 
@@ -254,7 +254,7 @@ def atualizar_caches():
 #     if representante == 'Lucas Gallo' or representante == 'Renato Rodi':
 
 #         df['preco'] = df['preco'].apply(lambda x: "R$ {:,.2f}".format(
-#         x).replace(",", "X").replace(".", ",").replace("X", "."))
+#         x).replace(",", "X")Erro na solicitação:.replace(".", ",").replace("X", "."))
         
 #     else:
 #         df['preco_final'] = df['preco_final'].apply(lambda x: "R$ {:,.2f}".format(x).replace(",", "X").replace(".", ",").replace("X", ".") if x != '' else '')

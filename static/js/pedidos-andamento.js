@@ -1,8 +1,6 @@
 // Função para preencher a tabela com os dados da API
 function preencherTabela(data) {
 
-    console.log(data);
-
     // Obtenha o elemento da tabela pelo ID
     const tableBody = document.getElementById('bodyTablePropostaAndamento');
 
@@ -10,6 +8,7 @@ function preencherTabela(data) {
     data.value.forEach(deal => {
         // Crie uma nova linha para cada item
         const row = document.createElement('tr');
+        let botaoGanhar, botaoPerder, botaoRevisar, botaoEspelhoPedido;
 
         // Extraia os campos do JSON
         const contactName = deal.ContactName;
@@ -21,6 +20,7 @@ function preencherTabela(data) {
         const contactId = deal.Deal.PersonId;
         const statusId = deal.Deal.StatusId;
         let stringstatusId = statusId;
+
 
         if (stringstatusId === 1) {
             stringstatusId = 'Em aberto ⏰'
@@ -54,7 +54,9 @@ function preencherTabela(data) {
 
         botaoRevisar = document.createElement('a'); // Criar um elemento <a>
         botaoRevisar.textContent = 'Revisar';
-        botaoRevisar.classList.add('btn-sm', 'btn-secondary'); // Adiciona a classe "button-success"
+        botaoRevisar.classList.add('btn-sm'); // Adiciona a classe "button-success"
+        botaoRevisar.style.color = 'black';
+        botaoRevisar.style.backgroundColor = 'gray';
         botaoRevisar.style.marginRight = '10px';
         botaoRevisar.setAttribute('data-button-id',deal.Id);
         botaoRevisar.setAttribute('href', '/consulta-preco/' + deal.ContactId + '/' + deal.Id + '/' + deal.Deal.Id);
@@ -65,25 +67,43 @@ function preencherTabela(data) {
 
         });
 
-        let botaoGanhar, botaoPerder;
-
         if (contactId && (approvalStatusId === 2 || !approvalStatusId) && externallyAccepted === true && statusId === 1) {
             
-            // Mostrar botão de ganhar
-            botaoGanhar = document.createElement('button');
+            botaoGanhar = document.createElement('a'); // Criar um elemento <a>
             botaoGanhar.textContent = 'Ganhar';
-            botaoGanhar.classList.add('btn-sm', 'btn-success'); // Adiciona a classe "button-success"
+            botaoGanhar.classList.add('btn-sm'); // Adiciona a classe "button-success"
+            botaoGanhar.style.color = 'black';
+            botaoGanhar.style.backgroundColor = 'green';
             botaoGanhar.style.marginRight = '10px';
+            botaoPerder.style.cursor = 'pointer';
             botaoGanhar.setAttribute('data-button-id',deal.Id);
-            
-            // Mostrar botão de perder
-            botaoPerder = document.createElement('button');
+    
+            // Mostrar botão de ganhar
+            // botaoGanhar = document.createElement('button');
+            // botaoGanhar.textContent = 'Ganhar';
+            // botaoGanhar.classList.add('btn-sm', 'btn-success'); // Adiciona a classe "button-success"
+            // botaoGanhar.style.marginRight = '10px';
+            // botaoGanhar.setAttribute('data-button-id',deal.Id);
+
+            botaoPerder = document.createElement('a'); // Criar um elemento <a>
             botaoPerder.textContent = 'Perder';
-            botaoPerder.classList.add('btn-sm', 'btn-danger'); // Adiciona a classe "button-danger"
+            botaoPerder.classList.add('btn-sm'); // Adiciona a classe "button-success"
+            botaoPerder.style.color = 'black';
+            botaoPerder.style.backgroundColor = 'red';
             botaoPerder.style.marginRight = '10px';
+            botaoPerder.style.cursor = 'pointer';
             botaoPerder.setAttribute('data-toggle', 'modal');
             botaoPerder.setAttribute('data-target','#modalPerderNegocio')
             botaoPerder.setAttribute('data-button-id',deal.Deal.Id);
+
+            // Mostrar botão de perder
+            // botaoPerder = document.createElement('button');
+            // botaoPerder.textContent = 'Perder';
+            // botaoPerder.classList.add('btn-sm', 'btn-danger'); // Adiciona a classe "button-danger"
+            // botaoPerder.style.marginRight = '10px';
+            // botaoPerder.setAttribute('data-toggle', 'modal');
+            // botaoPerder.setAttribute('data-target','#modalPerderNegocio')
+            // botaoPerder.setAttribute('data-button-id',deal.Deal.Id);
 
             botaoGanhar.addEventListener('click', function () {
                 ganharNegocio(deal.Id, deal.Deal.Id);
@@ -104,10 +124,21 @@ function preencherTabela(data) {
         } else {
             
             // Mostrar apenas botão de perder
-            botaoPerder = document.createElement('button');
+            // botaoPerder = document.createElement('button');
+            // botaoPerder.textContent = 'Perder';
+            // botaoPerder.classList.add('btn-sm', 'btn-danger'); // Adiciona a classe "button-danger"
+            // botaoPerder.style.marginRight = '10px';
+            // botaoPerder.setAttribute('data-toggle', 'modal');
+            // botaoPerder.setAttribute('data-target','#modalPerderNegocio')
+            // botaoPerder.setAttribute('data-button-id',deal.Deal.Id);
+
+            botaoPerder = document.createElement('a'); // Criar um elemento <a>
             botaoPerder.textContent = 'Perder';
-            botaoPerder.classList.add('btn-sm', 'btn-danger'); // Adiciona a classe "button-danger"
+            botaoPerder.classList.add('btn-sm'); // Adiciona a classe "button-success"
+            botaoPerder.style.color = 'black';
+            botaoPerder.style.backgroundColor = 'red';
             botaoPerder.style.marginRight = '10px';
+            botaoPerder.style.cursor = 'pointer';
             botaoPerder.setAttribute('data-toggle', 'modal');
             botaoPerder.setAttribute('data-target','#modalPerderNegocio')
             botaoPerder.setAttribute('data-button-id',deal.Deal.Id);
@@ -121,12 +152,24 @@ function preencherTabela(data) {
         let botaoAdicionarContato;
 
         if (!contactId) {
-            botaoAdicionarContato = document.createElement('button');
-            botaoAdicionarContato.textContent = '+ Contato'
-            botaoAdicionarContato.classList.add('btn-sm', 'btn-primary'); // Adiciona a classe "button-danger"
+            // botaoAdicionarContato = document.createElement('button');
+            // botaoAdicionarContato.textContent = '+ Contato'
+            // botaoAdicionarContato.classList.add('btn-sm'); // Adiciona a classe "button-danger"
+            // botaoAdicionarContato.style.backgroundColor = 'blue';
+            // botaoAdicionarContato.id = 'launchModalButton';
+            // botaoAdicionarContato.setAttribute('data-toggle', 'modal');
+            // botaoAdicionarContato.setAttribute('data-target', '#modalAddContato');
+
+            botaoAdicionarContato = document.createElement('a'); // Criar um elemento <a>
+            botaoAdicionarContato.textContent = '+ Contato';
+            botaoAdicionarContato.classList.add('btn-sm'); // Adiciona a classe "button-success"
+            botaoAdicionarContato.style.color = 'black';
+            botaoAdicionarContato.style.backgroundColor = '#6868f1';
+            botaoAdicionarContato.style.marginRight = '10px';
             botaoAdicionarContato.id = 'launchModalButton';
             botaoAdicionarContato.setAttribute('data-toggle', 'modal');
             botaoAdicionarContato.setAttribute('data-target', '#modalAddContato');
+    
 
             // Adicionar um evento de clique ao botão "add contatos"
             botaoAdicionarContato.addEventListener('click', function () {
@@ -223,10 +266,38 @@ function preencherTabela(data) {
         
         botoesCell.appendChild(botaoRevisar);
 
+        if (statusId === 2){
+
+            botaoEspelhoPedido = document.createElement('a'); // Criar um elemento <a>
+            botaoEspelhoPedido.textContent = 'Espelho';
+            botaoEspelhoPedido.classList.add('btn-sm'); // Adiciona a classe "btn-warning"
+            botaoEspelhoPedido.style.color = 'black';
+            botaoEspelhoPedido.style.marginRight = '10px';
+            botaoEspelhoPedido.style.backgroundColor = 'yellow';
+            botaoEspelhoPedido.style.cursor = 'pointer';
+            botaoEspelhoPedido.setAttribute('data-button-id', deal.Id);
+    
+            botaoEspelhoPedido.addEventListener('click', async function() {
+                try {
+                    // Chamar a função espelhoVenda com await, pois é uma função assíncrona
+                    await espelhoVenda(deal.DealId);
+                    console.log('Pedido espelhado com sucesso!');
+                    // Aqui você pode adicionar qualquer lógica adicional após o sucesso
+                } catch (error) {
+                    console.error('Erro ao espelhar pedido:', error);
+                    // Aqui você pode tratar erros ou feedback ao usuário, se necessário
+                }
+            });
+
+            botoesCell.appendChild(botaoEspelhoPedido);
+    
+        };
+        
         // Adicione botões à célula
         if (botaoGanhar) {
             botoesCell.appendChild(botaoGanhar);
         }
+
         botoesCell.appendChild(botaoPerder);
 
         if (!contactId) {
@@ -260,6 +331,41 @@ function applyButtonStyles(button) {
     button.style.cursor = 'pointer'; // Define cursor para pointer
     button.style.padding = '0'; // Remove padding
     button.style.outline = 'none'; // Remove o contorno de foco
+}
+
+// Função para carregar pedidos de venda
+async function espelhoVenda(dealId) {
+
+    const apiUrl = 'https://public-api2.ploomes.com/Orders?$filter=DealId+eq+' + dealId;
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'user-key': '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao buscar dados da API: ' + response.statusText);
+        }
+
+        const data = await response.json();
+
+        if (data.value && data.value.length > 0 && data.value[0].DocumentUrl) {
+            const documentUrl = data.value[0].DocumentUrl;
+            // Abrir o PDF em uma nova aba
+            window.open(documentUrl, '_blank');
+        } else {
+            throw new Error('URL do documento não encontrado na resposta da API');
+        }
+
+        return Promise.resolve(data); // Retorne os dados obtidos, se necessário
+    } catch (error) {
+        console.error('Erro na solicitação:', error);
+        return Promise.reject(error);
+    }
 }
 
 // Função para carregar uma página de registros
@@ -301,6 +407,7 @@ async function loadPage(currentPage, rowsPerPage, apiFilter) {
         return Promise.resolve();
     } catch (error) {
         console.error('Erro na solicitação:', error);
+        hideSpinner();
 
         // Retorne uma promessa rejeitada para sinalizar que houve um erro
         return Promise.reject(error);
