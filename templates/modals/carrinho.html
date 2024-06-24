@@ -82,14 +82,14 @@
             <div class="modal-body" style="max-height: 700px; overflow-y: auto;">
                 <div class="row mb-4">
                     <div class="col-sm-6">
-                        <label for="nomeGerarProposta">Nome</label>
+                        <label for="nomeGerarProposta">Revenda</label>
 
                         {% if dadosProposta[0] %}
                         <input class="form-control" type="text"
                             id="nomeGerarProposta" autocomplete="off" data-id="{{dadosProposta[1]}}" value="{{dadosProposta[0]}}" disabled>
                         {% else %}
                         <input class="form-control" type="text"
-                            id="nomeGerarProposta" autocomplete="off">
+                            id="nomeGerarProposta" autocomplete="off" placeholder="Digite algo...">
                         {% endif %}
 
                         <ul id="suggestionsPecas"
