@@ -55,7 +55,7 @@ function preencherTabela(data) {
         botaoRevisar = document.createElement('a'); // Criar um elemento <a>
         botaoRevisar.textContent = 'Revisar';
         botaoRevisar.classList.add('btn-sm'); // Adiciona a classe "button-success"
-        botaoRevisar.style.color = 'black';
+        botaoRevisar.style.color = 'white';
         botaoRevisar.style.backgroundColor = 'gray';
         botaoRevisar.style.marginRight = '10px';
         botaoRevisar.setAttribute('data-button-id',deal.Id);
@@ -72,10 +72,10 @@ function preencherTabela(data) {
             botaoGanhar = document.createElement('a'); // Criar um elemento <a>
             botaoGanhar.textContent = 'Ganhar';
             botaoGanhar.classList.add('btn-sm'); // Adiciona a classe "button-success"
-            botaoGanhar.style.color = 'black';
+            botaoGanhar.style.color = 'white';
             botaoGanhar.style.backgroundColor = 'green';
             botaoGanhar.style.marginRight = '10px';
-            botaoPerder.style.cursor = 'pointer';
+            botaoGanhar.style.cursor = 'pointer';
             botaoGanhar.setAttribute('data-button-id',deal.Id);
     
             // Mostrar botão de ganhar
@@ -88,7 +88,7 @@ function preencherTabela(data) {
             botaoPerder = document.createElement('a'); // Criar um elemento <a>
             botaoPerder.textContent = 'Perder';
             botaoPerder.classList.add('btn-sm'); // Adiciona a classe "button-success"
-            botaoPerder.style.color = 'black';
+            botaoPerder.style.color = 'white';
             botaoPerder.style.backgroundColor = 'red';
             botaoPerder.style.marginRight = '10px';
             botaoPerder.style.cursor = 'pointer';
@@ -135,7 +135,7 @@ function preencherTabela(data) {
             botaoPerder = document.createElement('a'); // Criar um elemento <a>
             botaoPerder.textContent = 'Perder';
             botaoPerder.classList.add('btn-sm'); // Adiciona a classe "button-success"
-            botaoPerder.style.color = 'black';
+            botaoPerder.style.color = 'white';
             botaoPerder.style.backgroundColor = 'red';
             botaoPerder.style.marginRight = '10px';
             botaoPerder.style.cursor = 'pointer';
@@ -163,9 +163,10 @@ function preencherTabela(data) {
             botaoAdicionarContato = document.createElement('a'); // Criar um elemento <a>
             botaoAdicionarContato.textContent = '+ Contato';
             botaoAdicionarContato.classList.add('btn-sm'); // Adiciona a classe "button-success"
-            botaoAdicionarContato.style.color = 'black';
+            botaoAdicionarContato.style.color = 'white';
             botaoAdicionarContato.style.backgroundColor = '#6868f1';
             botaoAdicionarContato.style.marginRight = '10px';
+            botaoAdicionarContato.style.cursor = 'pointer';
             botaoAdicionarContato.id = 'launchModalButton';
             botaoAdicionarContato.setAttribute('data-toggle', 'modal');
             botaoAdicionarContato.setAttribute('data-target', '#modalAddContato');
@@ -397,6 +398,8 @@ async function loadPage(currentPage, rowsPerPage, apiFilter) {
 
         // Parseia a resposta para JSON
         const data = await response.json();
+
+        console.log(data);
 
         // Chame a função para preencher a tabela com os dados filtrados
         preencherTabela(data);
