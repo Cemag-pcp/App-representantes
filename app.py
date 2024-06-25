@@ -1194,8 +1194,6 @@ def process_data():
 
     enviar_email(session['user_id'], data['nomeCliente'], deal_id)
 
-    remove_all() # remover itens do carrinho
-
     # for item in data['items']:
     #     item.pop('descCarreta', None)
 
@@ -1283,6 +1281,7 @@ def process_data():
     conn.close()
 
     # flash("Enviado com sucesso", 'success')
+    remove_all() # remover itens do carrinho
 
     return jsonify({'message': 'success'})
 
