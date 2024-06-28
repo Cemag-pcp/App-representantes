@@ -48,6 +48,10 @@ def resetar_cache():
 
 @cachetools.cached(cache_precos)
 def api_precos():
+    
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
+                        password=DB_PASS, host=DB_HOST)
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     response = requests.get(
         'http://cemag.innovaro.com.br/api/publica/v1/tabelas/listarPrecos')
@@ -1185,7 +1189,7 @@ def process_data():
         listaFP.append(data['formaPagamento'])
         listaCliente.append(data['nomeCliente'])
         lista_id.append(unique_id)
-
+    
     deal_id = criarOrdem(data['nomeCliente'], data['idCliente'], nomeContato, session['user_id'])
 
     atualizarEtapaProposta(deal_id)
@@ -1193,73 +1197,6 @@ def process_data():
     criarProposta(deal_id, data['observacao'], data['formaPagamento'], session['user_id'], listaProdutos, listaCores, listaPreco, listaQuantidade, listaPrecoUnitario, listaPercentDesconto)
 
     enviar_email(session['user_id'], data['nomeCliente'], deal_id)
-
-    # for item in data['items']:
-    #     item.pop('descCarreta', None)
-
-    # conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
-    #                         password=DB_PASS, host=DB_HOST)
-    # cur = conn.cursor()
-
-    # representante = session['user_id']
-
-    # query = "SELECT nome_completo FROM users WHERE username = %s"
-
-    # cur.execute(query, (representante,))
-
-    # nome_completo = cur.fetchall()
-    # nome_completo = nome_completo[0][0]
-
-    # items = data['items']
-    # nome = data['nome']
-    # contato = data['contato']
-    # formaPagamento = data['formaPagamento']
-    # observacoes = data['observacoes']
-    # nomeResponsavel = data['nomeResponsavel']
-    
-    # try:
-    #     idQuote = data['idQuote']
-    #     dealId = data['dealIdBackend']
-    # except:
-    #     pass
-
-
-    # # Crie um DataFrame a partir dos dados dos itens
-    # df_items = pd.DataFrame(items)
-    # df_items['nome'] = nome
-    # df_items['contato'] = contato
-    # df_items['formaPagamento'] = formaPagamento
-    # df_items['observacoes'] = observacoes
-    # df_items['representante'] = nome_completo
-    # df_items['id'] = unique_id
-    
-    # try:
-    #     df_items['dealId'] = dealId
-    # except:
-    #     pass
-
-    # if nomeResponsavel == '':
-    #     df_items['nomeResponsavel'] = nome_completo
-    # else:
-    #     df_items['nomeResponsavel'] = nomeResponsavel
-
-    # df_items['quanti'] = df_items['quanti'].apply(lambda x: float(x.replace("R$","").replace(".","").replace(",",".")))
-
-    # # df_items['valorReal'] = df_items['valorReal'].apply(lambda x: float(x.replace("R$","").replace(".","").replace(",",".")))
-
-    # df_items['percentDesconto'] = 1 - (df_items['quanti'] / df_items['valorReal'])
-
-    # descontoMaximo = (df_items['percentDesconto'] >= 0.192).any()
-
-    # try:
-    #     if idQuote != 'None':
-    #         revisarProposta(df_items, idQuote)
-
-    #         return jsonify({'message': 'success'})
-    # except:
-    #     pass
-    
-    # criarProposta(df_items, descontoMaximo)
 
     query = """INSERT INTO tb_orcamento (id,nome_cliente,contato_cliente,forma_pagamento,observacoes,quantidade,preco_final,codigo,cor,representante) 
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
@@ -1269,7 +1206,6 @@ def process_data():
                        listaQuantidade, listaPreco, listaProdutos, listaCores, listaRep,
                        ))
     
-
     # Abre uma transação explícita
     with conn:
         # Cria um cursor dentro do contexto da transação
