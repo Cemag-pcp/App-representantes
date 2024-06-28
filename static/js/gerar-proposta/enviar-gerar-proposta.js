@@ -103,14 +103,32 @@ function copiarItensETotalParaAreaDeTransferencia() {
         var cor = row.querySelector('#selectCor').value;
         var quantidade = row.querySelector('.quantidadeItens').value;
         var precoUnit = row.querySelector('.precoUnitItem').value;
+
         
         var subtotal = quantidade * precoUnit;
         total += subtotal;
 
-        textToCopy += `Produto: ${produto}\nDescrição: ${descricao}\nCor: ${cor}\nQuantidade: ${quantidade}\nPreço unitário: ${precoUnit}\nSubtotal: ${subtotal}\n\n`;
+        var subtotal_formatado = subtotal.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        var precoUnit = parseFloat(row.querySelector('.precoUnitItem').value); // Certifique-se de que é um número
+
+        var precoUnitFormatado = precoUnit.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+        });
+
+        textToCopy += `Produto: ${produto}\nDescrição: ${descricao}\nCor: ${cor}\nQuantidade: ${quantidade}\nPreço unitário: ${precoUnitFormatado}\nSubtotal: ${subtotal_formatado}\n\n`;
     });
 
-    textToCopy += `Total: ${total}`;
+    var totalFormatado = total.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+
+    textToCopy += `Total: ${totalFormatado}`;
 
     navigator.clipboard.writeText(textToCopy).catch(function(err) {
         console.error('Erro ao copiar para a área de transferência: ', err);
