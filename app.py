@@ -1207,6 +1207,10 @@ def process_data():
                        ))
     
     # Abre uma transação explícita
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
+                        password=DB_PASS, host=DB_HOST)
+    cur = conn.cursor()
+
     with conn:
         # Cria um cursor dentro do contexto da transação
         with conn.cursor() as cur:
@@ -1927,11 +1931,13 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
     # lista_product = df.to_dict(orient='records')
     # Estrutura JSON para cada produto
     products = []
+    total = 0
     for i, product_id in enumerate(lista_product):
+        total += product_id["Price"]
         product_json = {
             "Quantity": product_id["Quantity"],
             "UnitPrice": product_id["UnitPrice"],
-            "Total": product_id["Price"] * int(product_id["Quantity"]),
+            "Total": product_id["Price"],
             "ProductId": product_id["ProductId"],
             "Ordination": i,
             "Discount":product_id['Discount'] * 100,
@@ -1942,7 +1948,7 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
                 },
                 {
                     "FieldKey": "quote_product_E426CC8C-54CB-4B9C-8E4D-93634CF93455", # valor unit. c/ desconto
-                    "DecimalValue": product_id["Price"]
+                    "DecimalValue": product_id["UnitPrice"]
                 },
                 {
                     "FieldKey": "quote_product_4D6B83EE-8481-46B2-A147-1836B287E14C",  # prazo dias
