@@ -1017,7 +1017,8 @@ def atualizar_dados():
     rodado = request.args.get('rodado')
     pneu = request.args.get('pneu')
     opcionais = request.args.get('opcionais')
-
+    nome_cliente = request.args.get('nome_cliente')
+    
     representante = session['user_id']
 
     df_precos, df_precos_promo_frete = api_precos()
@@ -1029,8 +1030,8 @@ def atualizar_dados():
     else:
         df = df_produtos.merge(df_precos_promo_frete, how='left', on='codigo')
 
-    # regiao = buscarRegiaoCliente(nome_cliente)
-    regiao = 'Lista Preço SDE e COE'
+    regiao = buscarRegiaoCliente(nome_cliente)
+    # regiao = 'Lista Preço SDE e COE'
     
     df = df[df['lista_nova'] == regiao]
 
@@ -1426,15 +1427,15 @@ def atualizar_dados_sem_cliente():
                             password=DB_PASS, host=DB_HOST)
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    # cur.execute(
-    #     """select regiao from users where username = '{}'""".format(representante))
+    cur.execute(
+        """select regiao from users where username = '{}'""".format(representante))
 
-    # regiao = cur.fetchall()
-    # regiao = regiao[0]['regiao']
+    regiao = cur.fetchall()
+    regiao = regiao[0]['regiao']
 
-    # regiao = regiao.split(";")
+    regiao = regiao.split(";")
 
-    # df = df[df['lista_nova'].isin(regiao)]
+    df = df[df['lista_nova'].isin(regiao)]
 
     # Inicialize um DataFrame vazio para conter os resultados
     resultados = pd.DataFrame()
