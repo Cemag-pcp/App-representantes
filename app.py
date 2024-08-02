@@ -1172,7 +1172,7 @@ def process_data():
     if 'idContato' in data:
         nomeContato = data['idContato']
     else:
-        nomeContato = False
+        nomeContato = ""
 
     produtos = data['listaProdutos']
     unique_id = str(uuid.uuid4())  # Gerar id unico
