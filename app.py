@@ -1191,6 +1191,8 @@ def process_data():
         listaCliente.append(data['nomeCliente'])
         lista_id.append(unique_id)
     
+    print(listaObs)
+
     deal_id = criarOrdem(data['nomeCliente'], data['idCliente'], nomeContato, session['user_id'])
 
     atualizarEtapaProposta(deal_id)

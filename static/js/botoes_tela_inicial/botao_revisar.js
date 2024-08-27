@@ -116,7 +116,7 @@ document.getElementById('confirmarGerarProposta_revisar').addEventListener('clic
     var nomeGerarProposta = document.getElementById('nomeGerarProposta').dataset.id;
     var contatoGerarProposta = document.getElementById('contatoGerarProposta').dataset.id;
     var inputFormaPagamento = document.getElementById('inputFormaPagamento').value;
-    var observacaoGerarProposta = document.getElementById('observacaoGerarPropostaCarrinho').value;
+    var observacaoGerarProposta = document.getElementById('observacaoGerarProposta').value;
     var elementosProdutoInput = document.querySelectorAll('[id="produtoInput"]');
     var quoteId = document.getElementById('quoteId').value;
     var valorTotalCarrinho = document.getElementById('valorTotalCarrinho').value;

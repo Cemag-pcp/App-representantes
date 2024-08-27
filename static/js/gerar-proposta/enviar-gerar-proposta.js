@@ -8,7 +8,13 @@ var responsavel = document.getElementById('responsavelGerarProposta');
 // Função para lidar com o clique nos botões
 function handleClick() {
     // Seu código aqui para lidar com o clique nos botões
-    var observacao = document.getElementById('observacaoGerarProposta').value;
+    let observacao;
+
+    if (document.getElementById('observacaoGerarProposta').value === '') {
+        observacao = document.getElementById('observacaoGerarPropostaConsulta').value;
+    } else {
+        observacao = document.getElementById('observacaoGerarProposta').value;
+    }
 
     var listaProdutos = []; // Inicializa uma lista vazia para armazenar os produtos
 
