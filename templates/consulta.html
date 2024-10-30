@@ -1555,12 +1555,10 @@
 
   <script>
   $(document).ready(function () {
-    // Manipulador de clique para o botão de atualização de cache
-    $("#atualizar-cache").click(function () {
-      $.post("/atualizar-cache", function (data) {
-        // Exibe a mensagem de sucesso na div de mensagem
-        $("#mensagem").text(data.message);
-      });
+    $.post("/atualizar-cache", function (data) {
+      console.log("cache atualizado")
+      // Exibe a mensagem de sucesso na div de mensagem
+      $("#mensagem").text(data.message);
     });
   });
 </script>
