@@ -62,53 +62,52 @@ async function fetchData(apiUrl) {
     }
 }
 
-function guardarContato(){
-    
+function guardarContato() {
     const idContato = Number(document.getElementById('idInserirContato').getAttribute('data-id-contato'));
     const idDeal = Number(document.getElementById('idInserirContato').getAttribute('data-id'));
 
-    if (idContato) { // Se o contato foi preenchido
-        // URL da API para o PATCH request
-        const urlApi = `https://app6-api2.ploomes.com/Deals(${idDeal})`;
+    console.log('ID do Contato:', idContato);
+    console.log('ID do Deal:', idDeal);
 
-        // Dados para o corpo da requisição PATCH
+    if (idContato && idDeal) { // Se o contato e o deal foram preenchidos
+        const urlApi = `https://api2.ploomes.com/Deals(${idDeal})`;
+
         const body = JSON.stringify({
-            Id: idDeal,
-            PersonId: idContato
+            PersonId: idContato // Verifique se apenas 'PersonId' é necessário
         });
 
-        // Configurações da requisição PATCH
         const options = {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'user-key': '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3' // Substitua por sua chave de usuário
+                'user-key': '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3' // Chave sensível, use com cuidado
             },
             body: body
         };
 
-        // Fazendo a requisição PATCH
+        console.log('Corpo da requisição:', body);
+
         fetch(urlApi, options)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.statusText}`);
+                    return response.text().then(text => {
+                        console.error(`Erro na requisição: ${response.status} - ${text}`);
+                        throw new Error(`Erro na requisição: ${text}`);
+                    });
                 }
-                return response.json(); // Converter a resposta em JSON
+                return response.json();
             })
             .then(data => {
-                // Sucesso na atualização da negociação
                 console.log('Contato atualizado com sucesso:', data);
                 applyFilters();
-                exibirMensagem('sucesso','Contato salvo');
+                exibirMensagem('sucesso', 'Contato salvo');
             })
             .catch(error => {
-                // Lidar com erros
                 console.error('Erro ao atualizar a negociação:', error);
-                exibirMensagem('aviso','Atualize a página e tente novamente');
+                exibirMensagem('aviso', 'Atualize a página e tente novamente');
             });
-
-    } else { // Se não preencher o contato
-        exibirMensagem('aviso','Escolha uma opção dentro da lista');
+    } else {
+        exibirMensagem('aviso', 'Escolha uma opção dentro da lista');
     }
 }
 

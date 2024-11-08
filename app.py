@@ -1197,8 +1197,11 @@ def process_data():
 
     atualizarEtapaProposta(deal_id)
 
-    criarProposta(deal_id, data['observacao'], data['formaPagamento'], session['user_id'], listaProdutos, listaCores, listaPreco, listaQuantidade, listaPrecoUnitario, listaPercentDesconto)
-
+    try:
+        criarProposta(deal_id, data['observacao'], data['formaPagamento'], session['user_id'], listaProdutos, listaCores, listaPreco, listaQuantidade, listaPrecoUnitario, listaPercentDesconto)
+    except:
+        return jsonify({'message': 'error'})
+    
     enviar_email(session['user_id'], data['nomeCliente'], deal_id)
 
     query = """INSERT INTO tb_orcamento (id,nome_cliente,contato_cliente,forma_pagamento,observacoes,quantidade,preco_final,codigo,cor,representante) 
@@ -1864,35 +1867,6 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
 
     """Função para criar proposta"""
 
-    # nomeCliente = df['nome'][0]
-    # nomeContato = df['contato'][0]
-
-    # if nomeContato == '':
-    #     nomeContato = 'Null'
-
-    # if df['nomeResponsavel'][0] == '':
-    #     nomeRepresentante = df['representante'][0]
-    # else:
-    #     nomeRepresentante = df['nomeResponsavel'][0]
-
-    # listaProdutos = df['description'].values.tolist()
-    # formaPagamento = df['formaPagamento'][0]
-    # listaCores = df['cor'].values.tolist()
-
-    # listaPreco = df['quanti'].values.tolist()
-
-    # df["observacoes"] = df["observacoes"].apply(wrap_in_paragraph)
-
-    # listaQuantidade = df['numeros'].values.tolist()
-    # listaPrecoUnitario = df['valorReal'].values.tolist()
-    # listaPercentDesconto = df['percentDesconto'].values.tolist()
-
-    # print(df)
-
-    #DealId = criarOrdem(nomeCliente, nomeContato, nomeRepresentante)
-
-    #atualizarEtapaProposta(DealId)
-
     idFormaPagamento = idFormaPagamentoF(formaPagamento)
     id_CondicaoPagamento = idCondicaoPagamento(formaPagamento)
 
@@ -1901,6 +1875,7 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
     # Suas três listas
     ProductId = idCarretas(listaProdutos)
     color = idCores(listaCores)
+    print(color)
     price = listaPreco
     quantidade = listaQuantidade
     precoUnitario = listaPrecoUnitario
@@ -3410,7 +3385,7 @@ def atualizandoContato(nome_empresa,contatoRegistro,idDeals):
     if ContactId == 'Null':
         return 'Erro'
 
-    url = f"https://app6-api2.ploomes.com/Deals({idDeals})"
+    url = f"https://api2.ploomes.com/Deals({idDeals})"
 
     headers = {
         "User-Key": "5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3",
