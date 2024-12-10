@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Satisfação</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Container geral */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px solid #ffa500; /* Laranja */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Logo */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+            max-width: 150px;
+        }
+
+        /* Perguntas */
+        .form-container h3 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        /* Botão */
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ffa500; /* Laranja */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #e69500;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 15px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="\static\img\cemagL.png" alt="Logo da Empresa">
+        </div>
+        <div class="intro-text">
+            <p>
+                Agradecemos pela escolha e confiança creditada à Cemag.
+                Com o objetivo de aprimorar ainda mais a Qualidade dos nossos Produtos e Serviços,
+                convidamos você a responder uma breve pesquisa sobre a sua experiência de compra.
+            </p>
+        </div>
+        <form action="" method="POST">
+            {% for pergunta in perguntas %}
+                <h3>{{ pergunta[1] }}</h3> <!-- Texto da pergunta -->
+                {% if pergunta[2] == 'radio' %}
+                    {% for opcao in pergunta[3] %}
+                        <label>
+                            <input type="radio" name="{{ pergunta[0] }}" value="{{ opcao }}" required> {{ opcao }}
+                        </label>
+                    {% endfor %}
+                {% elif pergunta[2] == 'checkbox' %}
+                    <!-- Adicionando required apenas para pelo menos um checkbox -->
+                    <div>
+                        {% for opcao in pergunta[3] %}
+                            <label>
+                                <input type="checkbox" name="{{ pergunta[0] }}" value="{{ opcao }}" class="required-checkbox"> {{ opcao }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% elif pergunta[2] == 'text' %}
+                    <!-- Campo de texto sem required -->
+                    <textarea name="{{ pergunta[0] }}" rows="4" cols="50"></textarea>
+                {% endif %}
+            {% endfor %}
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const checkboxGroups = document.querySelectorAll('.required-checkbox');
+            const groupStatus = {};
+    
+            // Verificar cada checkbox no grupo
+            checkboxGroups.forEach(checkbox => {
+                const name = checkbox.name;
+                if (!groupStatus[name]) {
+                    groupStatus[name] = false; // Inicializa o grupo como "não selecionado"
+                }
+                if (checkbox.checked) {
+                    groupStatus[name] = true; // Marca o grupo como "selecionado" se qualquer checkbox for marcado
+                }
+            });
+    
+            // Validar os grupos
+            for (const groupName in groupStatus) {
+                if (!groupStatus[groupName]) {
+                    alert(`Selecione pelo menos uma opção para a pergunta: ${groupName}`);
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+    </script>
+        
+</body>
+</html>

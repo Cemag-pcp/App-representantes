@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from flask import render_template_string, jsonify
 import psycopg2  # pip install psycopg2
 import psycopg2.extras
+from psycopg2.extras import execute_values
+
 import pandas as pd
 import numpy as np
 import functools
@@ -141,7 +143,6 @@ def api_lista_produtos():
 
     return df_final
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
@@ -163,7 +164,6 @@ def login():
             flash('Usuário ou Senha inválida', category='error')
 
     return render_template('login.html')
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -3469,6 +3469,69 @@ def infoProposta(quoteId):
 
     return listaInfos
 
+# Função de conexão com o banco
+def get_db_connection():
+    return psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS,
+        host=DB_HOST
+    )
+
+# Endpoint para a pesquisa
+@app.route('/pesquisa1/<int:contact_id>', methods=['GET', 'POST'])
+def pesquisa1(contact_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Verificar se o usuário já respondeu à pesquisa
+    cur.execute("SELECT 1 FROM respostas WHERE contact_id = %s LIMIT 1", (contact_id,))
+    ja_respondeu = cur.fetchone()
+
+    if ja_respondeu:
+        cur.close()
+        conn.close()
+        return redirect(url_for('ja_respondeu'))
+
+    if request.method == 'POST':
+        respostas = []
+
+        # Capturar todas as respostas enviadas
+        for pergunta_id in request.form.keys():
+            if pergunta_id.isdigit():  # IDs de perguntas
+                valores = request.form.getlist(pergunta_id)  # Captura todos os valores selecionados
+                for valor in valores:
+                    respostas.append((contact_id, int(pergunta_id), valor))
+
+        # Inserir respostas no banco
+        query = """
+            INSERT INTO respostas (contact_id, pergunta_id, resposta) 
+            VALUES %s
+        """
+        execute_values(cur, query, respostas)
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return redirect(url_for('obrigado'))
+
+    # Obter perguntas do banco
+    cur.execute("SELECT id, texto, tipo, opcoes FROM perguntas ORDER BY id ASC")
+    perguntas = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template('pesquisas/pesquisa1.html', perguntas=perguntas, contact_id=contact_id)
+
+@app.route('/obrigado')
+def obrigado():
+    return "<h1>Obrigado por responder a pesquisa!</h1>"
+
+@app.route('/ja_respondeu')
+def ja_respondeu():
+    return "<h1>Você já respondeu a pesquisa!</h1>"
 
 if __name__ == '__main__':
     app.run(port=8000,debug=True)
