@@ -439,9 +439,10 @@ def precos_consulta():
     lista_regioes = regiao['regiao'].split(';')
 
     df = df[df['lista_nova'].isin(lista_regioes)]
-    
+
     if lista_preco_cliente:
-        df = df[df['lista_nova'] == lista_preco_cliente]
+        if not len(df[df['lista_nova'] == lista_preco_cliente]) == 0:
+            df = df[df['lista_nova'] == lista_preco_cliente]
 
     df.fillna('', inplace=True)
 
