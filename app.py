@@ -3541,6 +3541,10 @@ def obrigado():
 def ja_respondeu():
     return "<h1>Você já respondeu a pesquisa!</h1>"
 
+@app.route('/programacao')
+def programacao():
+    return render_template("programacao/programacao.html")
+
 @app.route('/api/dados/programacao', methods=['GET'])
 def dados_programacao():
     try:
@@ -3548,7 +3552,6 @@ def dados_programacao():
         google_credentials_json = os.getenv('GOOGLE_CREDENTIALS')
         scopes = ['https://www.googleapis.com/auth/spreadsheets',
                       "https://www.googleapis.com/auth/drive"]
-
 
         if google_credentials_json:
             credentials_dict = json.loads(google_credentials_json)
