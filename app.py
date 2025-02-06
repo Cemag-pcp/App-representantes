@@ -3548,7 +3548,7 @@ def programacao():
 @app.route('/api/dados/programacao', methods=['GET'])
 def dados_programacao():
     try:
-
+        load_dotenv(override=True)
         google_credentials_json = os.environ.get('GOOGLE_CREDENTIALS')
         scopes = ['https://www.googleapis.com/auth/spreadsheets',
                       "https://www.googleapis.com/auth/drive"]
