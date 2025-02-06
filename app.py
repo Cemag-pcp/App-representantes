@@ -22,6 +22,13 @@ from babel.numbers import format_currency
 import requests
 import cachetools
 from datetime import timedelta
+import gspread
+from google.oauth2.service_account import Credentials
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 warnings.filterwarnings("ignore")
 
@@ -3533,6 +3540,181 @@ def obrigado():
 @app.route('/ja_respondeu')
 def ja_respondeu():
     return "<h1>Você já respondeu a pesquisa!</h1>"
+
+@app.route('/api/dados/programacao', methods=['GET'])
+def dados_programacao():
+    try:
+
+        google_credentials_json = os.getenv('GOOGLE_CREDENTIALS')
+        scopes = ['https://www.googleapis.com/auth/spreadsheets',
+                      "https://www.googleapis.com/auth/drive"]
+
+
+        if google_credentials_json:
+            credentials_dict = json.loads(google_credentials_json)
+            credentials = Credentials.from_service_account_info(credentials_dict, scopes=scopes)
+            gc = gspread.authorize(credentials)
+            sh = gc.open_by_key("1olnMhK7OI6W0eJ-dvsi3Lku5eCYqlpzTGJfh1Q7Pv9I")
+            wks = sh.worksheet('Importar Dados')
+
+        # # Autenticação do Google Sheets
+        # scopes = ['https://www.googleapis.com/auth/spreadsheets',
+        #           "https://www.googleapis.com/auth/drive"]
+
+        # credentials = Credentials.from_service_account_file(
+        #     'credentials-google.json',
+        #     scopes=scopes
+        # )
+
+        # gc = gspread.authorize(credentials)
+        # sh = gc.open_by_key("1olnMhK7OI6W0eJ-dvsi3Lku5eCYqlpzTGJfh1Q7Pv9I")
+        # wks = sh.worksheet('Importar Dados')
+
+        # Obtém todos os dados da planilha
+        data = wks.get_all_values()
+
+        # Lista completa das classes a serem filtradas
+        classe_recurso = [
+            "Carretas Agrícolas com Carroceria Metálica",
+            "Carretas Agrícolas de Madeira",
+            "Carretas Tanque",
+            "Carretas Basculantes hidráulicas",
+            "Carretas Especiais",
+            "Colheitadeira",
+            "Transbordo",
+            "Roçadeiras M24",
+            "Outros Equipamentos",
+            "Produtos de Plantio",
+            "Carretas Agrícolas Fora de Linha"
+        ]
+
+        # Lista das classes que precisam de uma flag especial
+        classes_com_flag = {
+            "Carretas Especiais": "Carretas Especiais",
+            "Colheitadeira": "Colheitadeira",
+            "Transbordo": "Transbordo",
+            "Roçadeiras M24": "Roçadeiras M24",
+            "Outros Equipamentos": "Outros Equipamentos",
+            "Produtos de Plantio": "Produtos de Plantio",
+            "Carretas Agrícolas Fora de Linha": "Carretas Agrícolas Fora de Linha"
+        }
+
+        # Converte os dados para um formato estruturado (dicionário)
+        headers = data[0]
+        rows = data[1:]
+        structured_data = [dict(zip(headers, row)) for row in rows]
+
+        # structured_data = pd.DataFrame(structured_data)
+        # structured_data['PED_PREVISAOEMISSAODOC'] = pd.to_datetime(structured_data['PED_PREVISAOEMISSAODOC'], format='%d/%m/%Y')
+        # structured_data[structured_data['PED_PREVISAOEMISSAODOC'] == '2025-02-03']
+
+        # Obtém os parâmetros start e end da requisição
+        start = request.args.get('start')
+        end = request.args.get('end')
+
+        if not start or not end:
+            return jsonify({'error': 'Parâmetros start e end são obrigatórios.'}), 400
+
+        # Converte as datas para o formato datetime
+        start_date = datetime.fromisoformat(start.split('T')[0])  # Pega apenas a data
+        end_date = datetime.fromisoformat(end.split('T')[0])  # Pega apenas a data
+
+        # Converter classes_com_flag para minúsculas
+        classes_com_flag_lower = {key.lower(): value.lower() for key, value in classes_com_flag.items()}
+
+        # Converter a lista de classes para minúsculas
+        classe_recurso_lower = [classe.lower() for classe in classe_recurso]
+
+        # Converter a coluna "PED_RECURSO.CLASSE.NOME" para minúsculas
+        for row in structured_data:
+            if "PED_RECURSO.CLASSE.NOME" in row and isinstance(row["PED_RECURSO.CLASSE.NOME"], str):
+                row["PED_RECURSO.CLASSE.NOME"] = row["PED_RECURSO.CLASSE.NOME"].lower()
+
+        # Filtra apenas as linhas com as classes desejadas (agora em minúsculas)
+        filtered_data_rows = [row for row in structured_data if row.get("PED_RECURSO.CLASSE.NOME") in classe_recurso_lower]
+
+        # Filtra os dados com base na coluna `PED_PREVISAOEMISSAODOC`
+        filtered_data = []
+        for row in filtered_data_rows:
+            try:
+                programacao_date = datetime.strptime(row['PED_PREVISAOEMISSAODOC'], '%d/%m/%Y')
+                if start_date <= programacao_date <= end_date:
+                    filtered_data.append(row)
+            except (KeyError, ValueError):
+                continue  # Ignora linhas sem data válida
+
+        # Consolida os dados agrupando por cliente e data
+        consolidated_data = {}
+        total_por_dia = {}  # Dicionário para armazenar o total do dia
+        for row in filtered_data:
+            cliente = row['PED_PESSOA.CODIGO'].strip().lower()  # Remove espaços e padroniza em minúsculas
+            data_programacao = datetime.strptime(row['PED_PREVISAOEMISSAODOC'], '%d/%m/%Y').strftime('%Y-%m-%d')  # Garante o mesmo formato de data
+            
+            # Converte `PED_TOTAL` para float
+            try:
+                total = float(row.get("PED_TOTAL", "0").replace(",", "."))
+            except ValueError:
+                total = 0.0
+
+            produtos = row['PED_RECURSO.CODIGO']
+            classe = row.get("PED_RECURSO.CLASSE.NOME", "")
+
+            # Se a classe estiver na lista especial, a flag será o nome da classe
+            classe_flag = classes_com_flag_lower.get(classe, None)
+
+            key = f"{cliente}_{data_programacao}"  # Chave única
+
+            if key not in consolidated_data:
+                consolidated_data[key] = {
+                    "title": f"{cliente}",
+                    "start": data_programacao,
+                    "extendedProps": {
+                        "cliente": cliente,
+                        "produtos": produtos if isinstance(produtos, list) else [produtos],
+                        "total": total,
+                        "classe_flag": classe_flag  # Adiciona a flag com o nome da classe
+                    }
+                }
+            else:
+                # Atualiza produtos e soma os valores
+                consolidated_data[key]["extendedProps"]["produtos"].extend(
+                    produtos if isinstance(produtos, list) else [produtos]
+                )
+                consolidated_data[key]["extendedProps"]["total"] += total
+
+                # Atualiza o título com o novo total consolidado
+                consolidated_data[key]["title"] = f"{cliente}"
+
+            # Atualiza o total por dia
+            if data_programacao not in total_por_dia:
+                total_por_dia[data_programacao] = total
+            else:
+                total_por_dia[data_programacao] += total
+
+        # Adiciona entradas para "TOTAL DIA: " no consolidated_data
+        total_dia_entries = []
+        for data, total_dia in total_por_dia.items():
+            total_dia_entry = {
+                "title": f"TOTAL DIA",
+                "start": data,
+                "extendedProps": {
+                    "cliente": "TOTAL DIA",
+                    "produtos": [],
+                    "total": total_dia,
+                    "is_total_dia": True  # Adiciona este campo para diferenciar
+                }
+            }            
+            total_dia_entries.append(total_dia_entry)
+
+        # Organiza os resultados: primeiro os clientes normais, depois "TOTAL DIA"
+        normal_entries = [value for key, value in consolidated_data.items()]
+        result = normal_entries + total_dia_entries  # Adiciona "TOTAL DIA" ao final
+
+        # Retorna os dados no formato JSON esperado pelo FullCalendar
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(port=8000,debug=True)

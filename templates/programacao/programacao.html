@@ -1,0 +1,321 @@
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+
+<style>
+    /* Cabeçalho com a logo e o título */
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #ffffff;
+        color: rgb(0, 0, 0);
+        border-radius: 8px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .header img {
+        height: 50px;
+    }
+
+    .header h2 {
+        flex-grow: 1;
+        text-align: center;
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    /* Container dos cartões de faturamento */
+    #faturamento-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        min-width: 200px;
+    }
+
+    .card h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .card p {
+        font-size: 22px;
+        font-weight: bold;
+        color: #0284c7; /* Azul */
+        margin: 5px 0 0;
+    }
+
+    /* Estilo do calendário */
+    #calendar {
+        max-width: 90%;
+        margin: auto;
+    }
+
+    #legenda-flags {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .legenda-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .legenda-item {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        min-width: 180px;
+        text-align: center;
+    }
+    
+</style>
+
+<!-- Cabeçalho com Logo e Título -->
+<div class="header">
+    <img src="/static/img/SELO 50 ANOS ISOLADO_Prancheta 1.png" alt="Logo Empresa">
+    <h2>Programação de Cargas</h2>
+</div>
+
+<!-- Cards de Faturamento -->
+<div id="faturamento-container">
+    <div class="card" id="faturamento-mensal">
+        <h3>Faturamento Mensal</h3>
+        <p id="valor-mensal">R$ 0,00</p>
+    </div>
+    <div class="card" id="faturamento-diario">
+        <h3>Faturamento Diário</h3>
+        <p id="valor-diario">R$ 0,00</p>
+    </div>
+</div>
+
+<div id="legenda-flags">
+    <h4>Legenda:</h4>
+    <div class="legenda-container">
+        <div class="legenda-item" style="background-color: #FF5733; border: 2px solid #D84315;">Carretas Especiais</div>
+        <div class="legenda-item" style="background-color: #33FF57; border: 2px solid #2E7D32;">Colheitadeira</div>
+        <div class="legenda-item" style="background-color: #5733FF; border: 2px solid #311B92;">Transbordo</div>
+        <div class="legenda-item" style="background-color: #FFC300; border: 2px solid #FF8F00;">Roçadeiras M24</div>
+        <div class="legenda-item" style="background-color: #C70039; border: 2px solid #B71C1C;">Outros Equipamentos</div>
+        <div class="legenda-item" style="background-color: #900C3F; border: 2px solid #6A1B9A;">Produtos de Plantio</div>
+        <div class="legenda-item" style="background-color: #00BFFF; border: 2px solid #0288D1;">Carretas Agrícolas Fora de Linha</div>
+    </div>
+</div>
+
+<!-- Calendário -->
+<div id="calendar"></div>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+
+    function valorFaturamentoMensal(start, end) {
+        // Converte `start` e `end` para objetos Date
+        let startDate = new Date(start);
+        let endDate = new Date(end);
+
+        // Define o primeiro e o último dia do mês real baseado no centro do período recebido
+        let mesCentral = new Date((startDate.getTime() + endDate.getTime()) / 2);
+        let primeiroDiaMes = new Date(mesCentral.getFullYear(), mesCentral.getMonth(), 1).toISOString().split('T')[0];
+        let ultimoDiaMes = new Date(mesCentral.getFullYear(), mesCentral.getMonth() + 1, 0).toISOString().split('T')[0];
+
+        // Monta a URL para buscar apenas o mês correto
+        let url = `/api/dados/programacao?start=${primeiroDiaMes}&end=${ultimoDiaMes}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                let faturamentoMensal = 0;
+
+                data.forEach(evento => {
+                    faturamentoMensal += evento.extendedProps.total || 0;
+                });
+                
+                faturamentoMensal = faturamentoMensal / 2;
+
+                // Atualiza o cartão do faturamento mensal
+                document.getElementById('valor-mensal').textContent = `R$ ${faturamentoMensal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            })
+            .catch(error => {
+                console.error('Erro na requisição do faturamento mensal:', error);
+            });
+    }
+
+    function valorFaturamentoHoje() {
+        let hoje = new Date().toISOString().split('T')[0]; // Obtém a data de hoje no formato YYYY-MM-DD
+        let url = `/api/dados/programacao?start=${hoje}&end=${hoje}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                let faturamentoDiario = 0;
+
+                data.forEach(evento => {
+                    faturamentoDiario += evento.extendedProps.total || 0;
+                });
+
+                // Ajusta para remover a duplicação (dividindo por 2)
+                faturamentoDiario /= 2;
+
+                // Atualiza o cartão do faturamento diário
+                document.getElementById('valor-diario').textContent = `R$ ${faturamentoDiario.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            })
+            .catch(error => {
+                console.error('Erro na requisição do faturamento diário:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: function(fetchInfo, successCallback, failureCallback) {
+                let start = fetchInfo.startStr;
+                let end = fetchInfo.endStr;
+
+                // Chama a função de faturamento usando os mesmos parâmetros do calendário
+                valorFaturamentoMensal(start, end);
+                console.log(start, end);
+
+                // Faz a requisição de eventos para o calendário
+                fetch(`/api/dados/programacao?start=${start}&end=${end}`)
+                    .then(response => response.json())
+                    .then(data => successCallback(data))
+                    .catch(error => failureCallback(error));
+            },
+            locale: 'pt-br',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            eventContent: function(info) {
+                let clienteEl = document.createElement('div');
+                clienteEl.textContent = info.event.title;
+                clienteEl.style.fontSize = '14px';
+                clienteEl.style.marginBottom = '4px';
+                clienteEl.style.color = '#000';
+
+                let totalEl = document.createElement('div');
+                totalEl.textContent = `R$ ${info.event.extendedProps.total.toFixed(2)}`;
+                totalEl.style.fontWeight = 'bold';
+                totalEl.style.fontSize = '12px';
+                totalEl.style.color = '#000';
+
+                let containerEl = document.createElement('div');
+                containerEl.style.textAlign = 'center';
+                containerEl.appendChild(clienteEl);
+                containerEl.appendChild(totalEl);
+
+                return { domNodes: [containerEl] };
+            },
+            eventClick: function(info) {
+                var produtos = info.event.extendedProps.produtos.join(', ');
+                alert(
+                    `Cliente: ${info.event.extendedProps.cliente}\n` +
+                    `Data Programada: ${info.event.start.toLocaleDateString()}\n` +
+                    `Total: R$ ${info.event.extendedProps.total.toFixed(2)}\n` +
+                    `Produtos: ${produtos}`
+                );
+            },
+            eventOrder: function(a, b) {
+                if (a.extendedProps.is_total_dia && !b.extendedProps.is_total_dia) {
+                    return 1;
+                } else if (!a.extendedProps.is_total_dia && b.extendedProps.is_total_dia) {
+                    return -1;
+                }
+                return 0;
+            },
+            eventDidMount: function(info) {
+                info.el.setAttribute('title', `Cliente: ${info.event.extendedProps.cliente}\nTotal: R$ ${info.event.extendedProps.total.toFixed(2)}\nProdutos: ${info.event.extendedProps.produtos.join(',\n')}`);
+
+                // Define as cores padrão
+                let bgColor = 'rgba(59, 130, 246, 0.2)';  // Azul claro padrão
+                let borderColor = 'rgba(59, 130, 246, 0.6)';  // Azul padrão
+
+                // Verifica a flag da classe do recurso e ajusta as cores conforme necessário
+                let classeFlag = info.event.extendedProps.classe_flag;
+                if (classeFlag) {
+                    switch (classeFlag) {
+                        case "carretas especiais":
+                            bgColor = "#FF5733"; // Laranja
+                            borderColor = "#D84315";
+                            break;
+                        case "colheitadeira":
+                            bgColor = "#33FF57"; // Verde
+                            borderColor = "#2E7D32";
+                            break;
+                        case "transbordo":
+                            bgColor = "#5733FF"; // Azul roxo
+                            borderColor = "#311B92";
+                            break;
+                        case "roçadeiras m24":
+                            bgColor = "#FFC300"; // Amarelo
+                            borderColor = "#FF8F00";
+                            break;
+                        case "outros equipamentos":
+                            bgColor = "#C70039"; // Vermelho
+                            borderColor = "#B71C1C";
+                            break;
+                        case "produtos de plantio":
+                            bgColor = "#900C3F"; // Roxo
+                            borderColor = "#6A1B9A";
+                            break;
+                        case "carretas agrícolas fora de linha":
+                            bgColor = "#00BFFF"; // Azul Celeste
+                            borderColor = "#0288D1";
+                            break;
+                    }
+                }
+
+                // Aplica as cores ao evento
+                info.el.style.backgroundColor = bgColor;
+                info.el.style.borderColor = borderColor;
+                info.el.style.color = '#000';
+                info.el.style.borderRadius = '8px';
+                info.el.style.padding = '5px';
+                info.el.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+
+                // Destaque para eventos "TOTAL DIA:"
+                if (info.event.extendedProps.is_total_dia) {
+                    info.el.style.backgroundColor = 'rgba(16, 185, 129, 0.2)'; // Verde claro
+                    info.el.style.borderColor = 'rgba(16, 185, 129, 0.6)';
+                    info.el.style.fontWeight = 'bold';
+                    info.el.style.color = '#000';
+                }
+            },
+        });
+
+        // Renderiza o calendário
+        calendar.render();
+
+        valorFaturamentoHoje();
+    });
+</script>
