@@ -3549,7 +3549,7 @@ def programacao():
 def dados_programacao():
     try:
 
-        google_credentials_json = os.getenv('GOOGLE_CREDENTIALS')
+        google_credentials_json = os.environ.get('GOOGLE_CREDENTIALS')
         scopes = ['https://www.googleapis.com/auth/spreadsheets',
                       "https://www.googleapis.com/auth/drive"]
 
