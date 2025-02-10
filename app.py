@@ -3549,13 +3549,27 @@ def programacao():
 def dados_programacao():
     try:
         load_dotenv(override=True)
-        google_credentials_json = os.environ.get('GOOGLE_CREDENTIALS')
+
+        google_credentials_json={
+            "type":os.environ.get('type'),
+            "project_id":os.environ.get('project_id'),
+            "private_key":os.environ.get('private_key'),
+            "private_key_id":os.environ.get('private_key_id'),
+            "client_x509_cert_url":os.environ.get('client_x509_cert_url'),
+            "client_email":os.environ.get('client_email'),
+            "auth_uri":os.environ.get('auth_uri'),
+            "auth_provider_x509_cert_url":os.environ.get('auth_provider_x509_cert_url'),
+            "universe_domain":os.environ.get('universe_domain'),
+            "client_id":os.environ.get('client_id'),
+            "token_uri":os.environ.get('token_uri'),
+        }
+
         scopes = ['https://www.googleapis.com/auth/spreadsheets',
                       "https://www.googleapis.com/auth/drive"]
 
         if google_credentials_json:
-            credentials_dict = json.loads(google_credentials_json)
-            credentials = Credentials.from_service_account_info(credentials_dict, scopes=scopes)
+            # credentials_dict = json.loads(google_credentials_json)
+            credentials = Credentials.from_service_account_info(google_credentials_json, scopes=scopes)
             gc = gspread.authorize(credentials)
             sh = gc.open_by_key("1olnMhK7OI6W0eJ-dvsi3Lku5eCYqlpzTGJfh1Q7Pv9I")
             wks = sh.worksheet('Importar Dados')
