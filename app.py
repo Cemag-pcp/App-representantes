@@ -2232,15 +2232,15 @@ def revisarProposta(df, idQuote):
     # json_string = json.dumps(json_data, indent=2)
     # json_string = json.dumps(json_data, separators=(',', ':'))
 
-    url = "https://public-api2.ploomes.com/Quotes(" + idQuote + ")/Review?$select=Id&preservePreviousTemplate=true&preload=true"
+    # url = "https://public-api2.ploomes.com/Quotes(" + idQuote + ")/Review?$select=Id&preservePreviousTemplate=true&preload=true"
 
-    headers = {
-        "User-Key": "5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3",
-    }
+    # headers = {
+    #     "User-Key": "5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3",
+    # }
 
-    requests.post(url, headers=headers, json=json_data)
+    # requests.post(url, headers=headers, json=json_data)
 
-    enviar_email(nomeRepresentante, nomeCliente, DealId)
+    # enviar_email(nomeRepresentante, nomeCliente, DealId)
 
     return "Proposta criada"
 

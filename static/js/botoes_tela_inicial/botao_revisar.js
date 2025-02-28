@@ -1,27 +1,67 @@
 function confirmarRevisao(lista_product) {
-
     let products = [];
 
-    lista_product.slice(1).forEach((product_id, i) => {
+    // JSON de prazos por GroupId
+    const prazo_por_grupo = [
+        { "GroupId": 1181665, "Name": "Carretas Basculantes hidráulicas", "dias": 60 },
+        { "GroupId": 1181684, "Name": "Carretas Agrícolas de Madeira", "dias": 60 },
+        { "GroupId": 1181686, "Name": "Carretas Agrícolas com Carroceria Metálica", "dias": 60 },
+        { "GroupId": 1325894, "Name": "Carretas Tanque", "dias": 60 },
+        { "GroupId": 1375302, "Name": "Carretas Agrícolas", "dias": 60 },
+        { "GroupId": 1462324, "Name": "Carretas Especiais", "dias": 70 },
+        { "GroupId": 1479315, "Name": "Carretas Agrícolas Fora de Linha", "dias": 60 },
+        { "GroupId": 1479336, "Name": "Ainda Sem Classificação", "dias": 80 },
+        { "GroupId": 1652695, "Name": "70 sistemas Prod Especiais", "dias": 60 },
+        { "GroupId": 1655647, "Name": "70 Sistemas Carretas", "dias": 60 },
+        { "GroupId": 1669859, "Name": "Colheitadeira", "dias": 90 },
+        { "GroupId": 1669860, "Name": "Roçadeiras M24", "dias": 60 },
+        { "GroupId": 1669861, "Name": "Produtos de Plantio", "dias": 90 },
+        { "GroupId": 1669871, "Name": "Transbordo", "dias": 90 }
+    ];
 
+    // Criar um dicionário para acesso rápido ao prazo por GroupId
+    const prazo_dict = {};
+    prazo_por_grupo.forEach(item => {
+        prazo_dict[item.GroupId] = item.dias;
+    });
+
+    // Encontrar o maior prazo de entrega entre todos os produtos
+    let max_prazo = 0;
+
+    lista_product.slice(1).forEach((product_id, i) => {
+        // Garantir que GroupId seja um número
+        let produto = product_id["produto"]; // Objeto completo {Id, GroupId}
+
+        if (!produto || !produto.Id) {
+            console.warn(`⚠ Produto sem ID na posição ${i}, pulando...`);
+            return;
+        }
+
+        let groupId = parseInt(produto.GroupId, 10) || 0; // Garantir que seja numérico
+
+        console.log(`🔹 Processando Produto: ${produto.Id}, Grupo: ${groupId}`);
+
+        let prazo_entrega = prazo_dict[groupId] || 45; // Se não encontrar, assume 45 dias
+        max_prazo = Math.max(max_prazo, prazo_entrega);
+    
         let product_json = {
-            'Quantity': parseInt(product_id["quantidade"]), //ok
-            'UnitPrice': parseFloat(product_id["preco"]), //ok
-            'Total': parseFloat(product_id["preco"]) * parseInt(product_id["quantidade"]), //ok
-            'ProductId': product_id["produto"], //ok
+            'Quantity': parseInt(product_id["quantidade"]), // ok
+            'UnitPrice': parseFloat(product_id["preco"]), // ok
+            'Total': parseFloat(product_id["preco"]) * parseInt(product_id["quantidade"]), // ok
+            'ProductId': parseInt(product_id["produto"].Id) || 0, // 🔹 Garante que seja um número válido
             'Ordination': i,
             'OtherProperties': [
                 {
                     'FieldKey': "quote_product_76A1F57A-B40F-4C4E-B412-44361EB118D8",  // Cor 
-                    'IntegerValue': product_id["cor"] //ok
+                    'IntegerValue': product_id["cor"] // ok
                 },
                 {
                     'FieldKey': "quote_product_E426CC8C-54CB-4B9C-8E4D-93634CF93455", // valor unit. c/ desconto
-                    'DecimalValue': parseFloat(product_id["preco"]) //ok
+                    'DecimalValue': parseFloat(product_id["preco"]) // ok
                 },
                 {
                     'FieldKey': "quote_product_4D6B83EE-8481-46B2-A147-1836B287E14C",  // prazo dias
-                    'StringValue': "45;" //ok
+                    'StringValue': `${prazo_entrega.toString().padStart(3, '0')};` // Usa o prazo específico do grupo
                 },
                 {
                     'FieldKey': "quote_product_7FD5E293-CBB5-43C8-8ABF-B9611317DF75", // % de desconto no produto
@@ -29,87 +69,64 @@ function confirmarRevisao(lista_product) {
                 },
                 {
                     'FieldKey': "quote_product_A0AED1F2-458F-47D3-BA29-C235BDFC5D55", // Total sem desconto
-                    'DecimalValue': parseFloat(product_id["preco"]) * parseInt(product_id["quantidade"]) //ok
+                    'DecimalValue': parseFloat(product_id["preco"]) * parseInt(product_id["quantidade"]) // ok
                 },
             ]
         };
         products.push(product_json);
     });
 
-    var outrasInformacoes = lista_product.slice(0,1)[0];
+    var outrasInformacoes = lista_product[0];
 
     var json_data = {
-        "Id": parseInt(outrasInformacoes.IdQuote), //ok
-        // "DealId": outrasInformacoes['DealId'], //ok
-        "PersonId": parseInt(outrasInformacoes.PersonId), //ok
+        "Id": parseInt(outrasInformacoes.IdQuote), // ok
+        "PersonId": parseInt(outrasInformacoes.PersonId), // ok
         "TemplateId": 196596,
-        "Amount": parseFloat(outrasInformacoes.valorTotal), //ok
-        // "Discount": discount, //ok
+        "Amount": parseFloat(outrasInformacoes.valorTotal), // ok
         "InstallmentsAmountFieldKey": "quote_amount",
-        "Notes": outrasInformacoes.obs, //ok
+        "Notes": outrasInformacoes.obs, // ok
         "Sections": [
             {
                 "Code": 0,
-                "Total": parseFloat(outrasInformacoes.valorTotal), //ok
+                "Total": parseFloat(outrasInformacoes.valorTotal), // ok
                 "OtherProperties": [
                     {
                         "FieldKey": "quote_section_8136D2B9-1496-4C52-AB70-09B23A519286",  // Prazo conjunto
-                        "StringValue": "045;"
+                        "StringValue": `${max_prazo.toString().padStart(3, '0')};` // Usa o maior prazo encontrado
                     },
                     {
                         "FieldKey": "quote_section_0F38DF78-FE65-471C-A391-9E8759470D4E",  // Total
-                        "DecimalValue": parseFloat(outrasInformacoes.valorTotal) //ok
-                    },
-                    {
-                        "FieldKey": "quote_section_0E7B5C7B-AD6B-480F-B55E-7F7ABEC4B08C", // Total sem desconto
-                        "DecimalValue": parseFloat(outrasInformacoes.valorTotal) //ok
+                        "DecimalValue": parseFloat(outrasInformacoes.valorTotal) // ok
                     },
                     {
                         "FieldKey": "quote_section_64320D57-6350-44AB-B849-6A6110354C79",  // Total de itens
-                        "IntegerValue": parseInt(outrasInformacoes.totalQuantidade) //ok
+                        "IntegerValue": parseInt(outrasInformacoes.totalQuantidade) // ok
                     }
                 ],
-                "Products": products //ok
+                "Products": products // ok
             }
         ],
         "OtherProperties": [
             {
                 "FieldKey": "quote_0FB9F0CB-2619-44C5-92BD-1A2D2D818BFE",  // Forma de pagamento
-                "IntegerValue": outrasInformacoes.inputFormaPagamento.Id //ok
+                "IntegerValue": outrasInformacoes.inputFormaPagamento.Id // ok
             },
             {
                 "FieldKey": "quote_DE50A0F4-1FBE-46AA-9B5D-E182533E4B4A",  // Texto simples
-                "StringValue": outrasInformacoes.inputFormaPagamentoTexto //ok
-            },
-            {
-                "FieldKey": "quote_E85539A9-D0D3-488E-86C5-66A49EAF5F3A",  // Condições de pagamento
-                "IntegerValue": outrasInformacoes.idCondicaoPagamento.Id //ok
-            },
-            {
-                "FieldKey": "quote_F879E39D-E6B9-4026-8B4E-5AD2540463A3",  // Tipo de frete
-                "IntegerValue": 22886508
-            },
-            {
-                "FieldKey": "quote_6D0FC2AB-6CCC-4A65-93DD-44BF06A45ABE",  // Validade
-                "IntegerValue": 18826538
+                "StringValue": outrasInformacoes.inputFormaPagamentoTexto // ok
             },
             {
                 "FieldKey": "quote_520B942C-F3FD-4C6F-B183-C2E8C3EB6A33",  // Prazo de entrega
-                "IntegerValue": 45
+                "IntegerValue": max_prazo // Usa o maior prazo dos produtos
             },
             {
                 "FieldKey": "quote_82F9DE57-6E06-402A-A444-47F350284117", // Atualizar dados
                 "BoolValue": true
-            },
-            {
-                "FieldKey": "quote_16CDE30A-C6F1-4998-8B73-661CF89160B8", // Permissão - Condicões de pagamento
-                "StringValue": "Permitido"
             }
         ]
-    }
+    };
 
-    salvarRevisao(json_data,outrasInformacoes.IdQuote);
-
+    salvarRevisao(json_data, outrasInformacoes.IdQuote);
 }
 
 document.getElementById('confirmarGerarProposta_revisar').addEventListener('click', function() {
@@ -195,7 +212,7 @@ document.getElementById('confirmarGerarProposta_revisar').addEventListener('clic
 
 function idProdutos(carreta) {
     return new Promise((resolve, reject) => {
-        const apiUrl = 'https://public-api2.ploomes.com/Products?$top=1&$filter=Code+eq+\'' + carreta + '\'&$select=Id';
+        const apiUrl = `https://public-api2.ploomes.com/Products?$top=1&$filter=Code+eq+'${carreta}'&$select=Id,GroupId`;
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', apiUrl);
@@ -204,20 +221,33 @@ function idProdutos(carreta) {
         xhr.onload = function () {
             if (xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
-                // Manipular os dados recebidos da API aqui
-                resolve(data.value[0].Id); // Alterado para data.value[0].Id para acessar o Id corretamente
+
+                if (data.value && data.value.length > 0) {
+                    const produto = {
+                        Id: data.value[0].Id,
+                        GroupId: data.value[0].GroupId || 0 // Se GroupId for null, define como 0
+                    };
+
+                    console.log("🔹 Produto encontrado:", produto);
+                    resolve(produto);
+                } else {
+                    console.warn(`⚠ Nenhum produto encontrado para: ${carreta}`);
+                    resolve({ Id: null, GroupId: 0 }); // Evita erro caso não encontre o produto
+                }
             } else {
-                console.error('Erro ao chamar a API:', xhr.statusText);
+                console.error('❌ Erro ao chamar a API:', xhr.statusText);
                 reject(xhr.statusText);
             }
         };
+
         xhr.onerror = function () {
-            console.error('Erro ao chamar a API.');
+            console.error('❌ Erro na solicitação da API.');
             reject('Erro ao chamar a API.');
         };
+
         xhr.send();
     });
-};
+}
 
 function idCores(cor) {
     return new Promise((resolve, reject) => {
