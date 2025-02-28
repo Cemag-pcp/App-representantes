@@ -1877,77 +1877,74 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
 
     idFormaPagamento = idFormaPagamentoF(formaPagamento)
     id_CondicaoPagamento = idCondicaoPagamento(formaPagamento)
-
     idRep = idRepresentante(nomeRepresentante)
 
-    # Suas três listas
-    ProductId = idCarretas(listaProdutos)
+    # Chamar as funções para obter os dados
+    ProductId = idCarretas(listaProdutos)  # Agora retorna (ProductId, GroupId, Prazo)
     color = idCores(listaCores)
-    print(color)
     price = listaPreco
     quantidade = listaQuantidade
     precoUnitario = listaPrecoUnitario
     percentDesconto = listaPercentDesconto
-    
-    # Inicializar uma lista vazia
+
+    # Inicializar uma lista vazia para armazenar os produtos
     lista_product = []
 
     # Criar um dicionário para cada conjunto de valores correspondentes e adicioná-lo à lista
     for i in range(len(ProductId)):
         product_info = {
-            "ProductId": ProductId[i],
+            "ProductId": ProductId[i][0],  # ID do Produto
+            "GroupId": ProductId[i][1],  # ID do Grupo (caso seja necessário usar futuramente)
+            "Prazo": ProductId[i][2],  # Prazo correto baseado no GroupId
             "IdCor": color[i],
             "Price": price[i],
             "Quantity": quantidade[i],
             "UnitPrice": precoUnitario[i],
             "Discount": percentDesconto[i]
         }
-
         lista_product.append(product_info)
 
-    # Inicializar uma variável para o total em valor e total e quantidade de itens
-    total = 0
-    totalItens = 0
+    # Inicializar variáveis para o total em valor e quantidade de itens
+    total = sum(product["Price"] * int(product['Quantity']) for product in lista_product)
+    totalItens = sum(int(product['Quantity']) for product in lista_product)
 
-    # Calcular o total somando os preços
-    for product in lista_product:
-        total += product["Price"] * int(product['Quantity'])
-        totalItens += int(product['Quantity'])
-
-    # lista_product = df.to_dict(orient='records')
-    # Estrutura JSON para cada produto
+    # Criar a lista de produtos no formato JSON correto
     products = []
     total = 0
-    for i, product_id in enumerate(lista_product):
-        total += product_id["Price"]
+
+    for i, product in enumerate(lista_product):
+        total += product["Price"]
+
         product_json = {
-            "Quantity": product_id["Quantity"],
-            "UnitPrice": product_id["UnitPrice"],
-            "Total": product_id["Price"],
-            "ProductId": product_id["ProductId"],
+            "Quantity": product["Quantity"],
+            "UnitPrice": product["UnitPrice"],
+            "Total": product["Price"],
+            "ProductId": product["ProductId"],
             "Ordination": i,
-            "Discount":product_id['Discount'] * 100,
+            "Discount": product["Discount"] * 100,
             "OtherProperties": [
                 {
                     "FieldKey": "quote_product_76A1F57A-B40F-4C4E-B412-44361EB118D8",  # Cor
-                    "IntegerValue": product_id["IdCor"]
+                    "IntegerValue": product["IdCor"]
                 },
                 {
                     "FieldKey": "quote_product_E426CC8C-54CB-4B9C-8E4D-93634CF93455", # valor unit. c/ desconto
-                    "DecimalValue": product_id["UnitPrice"]
+                    "DecimalValue": product["UnitPrice"]
                 },
                 {
                     "FieldKey": "quote_product_4D6B83EE-8481-46B2-A147-1836B287E14C",  # prazo dias
-                    "StringValue": "45;"
+                    "StringValue": f"{product['Prazo']};"  # Insere o prazo correto
                 },
                 {
                     "FieldKey": "quote_product_7FD5E293-CBB5-43C8-8ABF-B9611317DF75", # % de desconto no produto
-                    "DecimalValue" : product_id["Discount"] * 100
+                    "DecimalValue": product["Discount"] * 100
                 }
-
             ]
         }
+
         products.append(product_json)
+
+    max_prazo = max([product["Prazo"] for product in lista_product], default=0)
 
     # Estrutura JSON principal com a lista de produtos
     json_data = {
@@ -2002,7 +1999,7 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
             },
             {
                 "FieldKey": "quote_520B942C-F3FD-4C6F-B183-C2E8C3EB6A33",  # Dias para entrega
-                "IntegerValue": 45
+                "IntegerValue": max_prazo
             }
         ]
     }
@@ -2089,7 +2086,9 @@ def revisarProposta(df, idQuote):
     # Criar um dicionário para cada conjunto de valores correspondentes e adicioná-lo à lista
     for i in range(len(ProductId)):
         product_info = {
-            "ProductId": ProductId[i],
+            "ProductId": ProductId[i][0],
+            "GroupId": ProductId[i][1],  # ID do Grupo (caso seja necessário usar futuramente)
+            "Prazo": ProductId[i][2],  # Prazo correto baseado no GroupId
             "IdCor": color[i],
             "Price": price[i],
             "Quantity": quantidade[i],
@@ -2100,19 +2099,25 @@ def revisarProposta(df, idQuote):
 
         lista_product.append(product_info)
 
-    # Inicializar uma variável para o total em valor e total e quantidade de itens
-    total = 0
-    totalItens = 0
+    # Inicializar variáveis para o total em valor e quantidade de itens
+    total = sum(product["Price"] * int(product['Quantity']) for product in lista_product)
+    totalItens = sum(int(product['Quantity']) for product in lista_product)
 
-    # Calcular o total somando os preços
-    for product in lista_product:
-        total += product["Price"] * int(product['Quantity'])
-        totalItens += int(product['Quantity'])
+    # Criar a lista de produtos no formato JSON correto
+    products = []
+    total = 0
+
+    # # Calcular o total somando os preços
+    # for product in lista_product:
+    #     total += product["Price"] * int(product['Quantity'])
+    #     totalItens += int(product['Quantity'])
 
     # lista_product = df.to_dict(orient='records')
     # Estrutura JSON para cada produto
-    products = []
     for i, product_id in enumerate(lista_product):
+
+        total += product_id["Price"]
+
         product_json = {
             "Quantity": product_id["Quantity"],
             "UnitPrice": product_id["UnitPrice"],
@@ -2130,7 +2135,7 @@ def revisarProposta(df, idQuote):
                 },
                 {
                     "FieldKey": "quote_product_4D6B83EE-8481-46B2-A147-1836B287E14C",  # prazo dias
-                    "StringValue": "45;"
+                    "StringValue": f"{product_id['Prazo']};"  # Insere o prazo correto
                 },
                 {
                     "FieldKey": "quote_product_7FD5E293-CBB5-43C8-8ABF-B9611317DF75", # % de desconto no produto
@@ -2143,6 +2148,8 @@ def revisarProposta(df, idQuote):
             ]
         }
         products.append(product_json)
+
+    max_prazo = max([product["Prazo"] for product in lista_product], default=0)
 
     # Estrutura JSON principal com a lista de produtos
     json_data = {
@@ -2161,7 +2168,7 @@ def revisarProposta(df, idQuote):
                 "OtherProperties": [
                     {
                         "FieldKey": "quote_section_8136D2B9-1496-4C52-AB70-09B23A519286",  # Prazo conjunto
-                        "StringValue": "045;"
+                        "StringValue": f"{max_prazo};"  # Insere o prazo correto
                     },
                     {
                         "FieldKey": "quote_section_0F38DF78-FE65-471C-A391-9E8759470D4E",  # Total
@@ -2202,7 +2209,7 @@ def revisarProposta(df, idQuote):
             },
             {
                 "FieldKey": "quote_520B942C-F3FD-4C6F-B183-C2E8C3EB6A33",  # Prazo de entrega
-                "IntegerValue": 45
+                "IntegerValue": max_prazo
             },
             {
                 "FieldKey": "quote_82F9DE57-6E06-402A-A444-47F350284117", # Atualizar dados
@@ -2385,40 +2392,122 @@ def infoRepresentantes(nomeRepresentante):
 def idCarretas(listaProdutos):
     """Função para buscar o id das carretas"""
 
-    # Define a URL da API e os nomes dos produtos que você deseja buscar
-    url = "https://public-api2.ploomes.com/Products?$top=1&$filter=Code+eq+'{}'&$select=Id"
+    # prazo_por_classe = [
+    #     {
+    #         "Id": 1181665,
+    #         "Name": "Carretas Basculantes hidráulicas",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1181684,
+    #         "Name": "Carretas Agrícolas de Madeira",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1181686,
+    #         "Name": "Carretas Agrícolas com Carroceria Metálica",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1325894,
+    #         "Name": "Carretas Tanque",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1375302,
+    #         "Name": "Carretas Agrícolas",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1462324,
+    #         "Name": "Carretas Especiais",
+    #         "dias": 70
+    #     },
+    #     {
+    #         "Id": 1479315,
+    #         "Name": "Carretas Agrícolas Fora de Linha",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1479336,
+    #         "Name": "Ainda Sem Classificação",
+    #         "dias": 80
+    #     },
+    #     {
+    #         "Id": 1652695,
+    #         "Name": "70 sistemas Prod Especiais",
+    #         "dias":  60
+    #     },
+    #     {
+    #         "Id": 1655647,
+    #         "Name": "70 Sistemas Carretas",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1669859,
+    #         "Name": "Colheitadeira",
+    #         "dias": 90
+    #     },
+    #     {
+    #         "Id": 1669860,
+    #         "Name": "Roçadeiras M24",
+    #         "dias": 60
+    #     },
+    #     {
+    #         "Id": 1669861,
+    #         "Name": "Produtos de Plantio",
+    #         "dias": 90
+    #     },
+    #     {
+    #         "Id": 1669871,
+    #         "Name": "Transbordo",
+    #         "dias": 90
+    #     }
+
+    # ]
+
+    # Dicionário com os prazos por classe de produtos
+    prazo_por_classe = {
+        1181665: 60, 1181684: 60, 1181686: 60, 1325894: 60, 1375302: 60,
+        1462324: 70, 1479315: 60, 1479336: 80, 1652695: 60, 1655647: 60,
+        1669859: 90, 1669860: 60, 1669861: 90, 1669871: 90
+    }
+
+    # Define a URL da API
+    url = "https://public-api2.ploomes.com/Products?$top=1&$filter=Code+eq+'{}'&$select=Id,GroupId"
 
     headers = {
         "User-Key": "5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3",
     }
 
-    # Inicializa uma lista para armazenar os IDs dos produtos encontrados
-    product_ids = []
+    # Inicializa uma lista para armazenar os resultados
+    produtos_info = []
 
-    # Realiza uma solicitação GET para cada nome de produto
-    for product_name in listaProdutos:
-        # Define a URL completa substituindo '{}' pelo nome do produto atual
-        api_url = url.format(product_name)
+    # Realiza uma solicitação GET para cada código de produto
+    for product_code in listaProdutos:
+        # Define a URL completa substituindo '{}' pelo código do produto atual
+        api_url = url.format(product_code)
 
-        # Realiza a solicitação GET para o produto atual
-        response = requests.get(api_url, headers=headers)
-
-        # Verifica se a solicitação foi bem-sucedida (código de status 200)
-        if response.status_code == 200:
+        try:
+            response = requests.get(api_url, headers=headers)
+            response.raise_for_status()  # Levanta um erro caso a requisição falhe
+            
             data = response.json()
-            # Verifica se a resposta contém dados
             if "value" in data and data["value"]:
-                # Acessa o ID do primeiro item encontrado
                 product_id = data["value"][0]["Id"]
-                product_ids.append((product_id))
+                group_id = data["value"][0]["GroupId"]
+
+                # Busca o prazo com base no GroupId, se não existir, usa 0 como padrão
+                prazo = prazo_por_classe.get(group_id, 0)
+
+                produtos_info.append((product_id, group_id, prazo))
             else:
-                print(f"Nenhum ID encontrado para o produto '{product_name}'.")
-        else:
-            print(
-                f"Erro na solicitação para o produto '{product_name}': Código de status {response.status_code}")
+                print(f"Nenhum dado encontrado para o produto '{product_code}'.")
 
-    return product_ids
+        except requests.exceptions.RequestException as e:
+            print(f"Erro ao buscar '{product_code}': {e}")
 
+    return produtos_info
 
 def idCores(listaCores):
     """Função para buscar o id das cores"""
@@ -2999,8 +3088,6 @@ def criarVenda(dealId, idUltimaProposta):
     contactId = data['value'][0]['ContactId']
     amount = data['value'][0]['Amount']
     notes = data['value'][0]['Notes']
-
-    print(data)
 
     json1 = {
         "ContactId": contactId,
