@@ -1199,17 +1199,14 @@ def process_data():
         listaCliente.append(data['nomeCliente'])
         lista_id.append(unique_id)
     
-    print(listaObs)
-
     deal_id = criarOrdem(data['nomeCliente'], data['idCliente'], nomeContato, session['user_id'])
-
-    atualizarEtapaProposta(deal_id)
 
     try:
         criarProposta(deal_id, data['observacao'], data['formaPagamento'], session['user_id'], listaProdutos, listaCores, listaPreco, listaQuantidade, listaPrecoUnitario, listaPercentDesconto)
     except:
         return jsonify({'message': 'error'})
     
+    # atualizarEtapaProposta(deal_id)
     enviar_email(session['user_id'], data['nomeCliente'], deal_id)
 
     query = """INSERT INTO tb_orcamento (id,nome_cliente,contato_cliente,forma_pagamento,observacoes,quantidade,preco_final,codigo,cor,representante) 
@@ -1238,7 +1235,6 @@ def process_data():
     remove_all() # remover itens do carrinho
 
     return jsonify({'message': 'success'})
-
 
 @app.route('/filtrar_regiao', methods=['POST'])
 def atualizar_regiao():
@@ -1827,6 +1823,7 @@ def criarOrdem(nomeCliente, ContactId, PersonId, nomeRepresentante):
             "Title": nomeCliente,
             "ContactId": ContactId,
             "OwnerId": OwnerId,
+            "StageId": 166905, # Proposta
         }
 
     else:
@@ -1835,10 +1832,13 @@ def criarOrdem(nomeCliente, ContactId, PersonId, nomeRepresentante):
             "Title": nomeCliente,
             "ContactId": ContactId,
             "OwnerId": OwnerId,
-            "PersonId": PersonId
+            "PersonId": PersonId,
+            "StageId": 166905 # Proposta
         }
 
     # Fazendo a requisição POST com os dados no corpo
+    print(data)
+
     response = requests.post(url, headers=headers, json=data)
 
     # Verifica se a requisição foi bem-sucedida (código de status 201 indica criação)
@@ -2796,7 +2796,7 @@ def enviar_email(nomeRepresentante, nomeCliente, DealId):
     smtp_host = 'smtp.gmail.com'
     smtp_port = 587
     smtp_user = 'sistema@cemag.com.br'
-    smtp_password = 'cem@1600'
+    smtp_password = 'qlxn ible gdmg yamz'
 
     for email in email_representante:
 
@@ -2819,7 +2819,6 @@ def enviar_email(nomeRepresentante, nomeCliente, DealId):
             print('E-mail enviado com sucesso!')
 
     return 'Sucess'
-
 
 def buscarRegiaoCliente(nomeCliente):
     """Função para buscar a região por cliente"""
@@ -3184,7 +3183,7 @@ def reenviarEmail():
     nomeCliente = data.get('nomeCliente')
     nome_representante = session['user_id']
 
-    enviar_email(nome_representante, nomeCliente, deal_id)
+    # enviar_email(nome_representante, nomeCliente, deal_id)
 
     return 'E-mail reenviado'
 
@@ -3819,6 +3818,96 @@ def dados_programacao():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Função para encontrar o próximo dia livre considerando finais de semana e ocupação
+def encontrar_proximo_dia_livre(df, data_inicial, coluna_data, dias_adicionais):
+    # Adicionar os dias iniciais ao prazo
+    nova_data = data_inicial + timedelta(days=dias_adicionais)
+    
+    # Loop para garantir que a data não caia em um dia ocupado ou fim de semana
+    while True:
+        # Se for sábado (5) ou domingo (6), pula para o próximo dia útil
+        if nova_data.weekday() in [5, 6]: 
+            nova_data += timedelta(days=1)
+            continue
+        
+        # Verifica se a data já está ocupada
+        if nova_data in df[coluna_data].values:
+            nova_data += timedelta(days=1)  # Empurra para frente
+        else:
+            break  # Data livre encontrada
+    
+    return nova_data
+
+def tratamento_prazo_entrega():
+
+    load_dotenv(override=True)
+
+    google_credentials_json={
+        "type":os.environ.get('type'),
+        "project_id":os.environ.get('project_id'),
+        "private_key":os.environ.get('private_key'),
+        "private_key_id":os.environ.get('private_key_id'),
+        "client_x509_cert_url":os.environ.get('client_x509_cert_url'),
+        "client_email":os.environ.get('client_email'),
+        "auth_uri":os.environ.get('auth_uri'),
+        "auth_provider_x509_cert_url":os.environ.get('auth_provider_x509_cert_url'),
+        "universe_domain":os.environ.get('universe_domain'),
+        "client_id":os.environ.get('client_id'),
+        "token_uri":os.environ.get('token_uri'),
+    }
+
+    scopes = ['https://www.googleapis.com/auth/spreadsheets',
+                    "https://www.googleapis.com/auth/drive"]
+
+    if google_credentials_json:
+        # credentials_dict = json.loads(google_credentials_json)
+        credentials = Credentials.from_service_account_info(google_credentials_json, scopes=scopes)
+        gc = gspread.authorize(credentials)
+        sh = gc.open_by_key("1olnMhK7OI6W0eJ-dvsi3Lku5eCYqlpzTGJfh1Q7Pv9I")
+        wks = sh.worksheet('Importar Dados')
+
+    data = wks.get_all_values()
+    
+    df = pd.DataFrame(data[1:], columns=data[0])  # Pulando o cabeçalho
+
+    # Convertendo a coluna 'PED_PREVISAOEMISSAODOC' para datetime
+    df['PED_PREVISAOEMISSAODOC'] = pd.to_datetime(df['PED_PREVISAOEMISSAODOC'], format='%d/%m/%Y', errors='coerce')
+
+    # Definir a data atual
+    hoje = datetime.today()
+
+    # Encontrar o próximo dia livre a partir de hoje
+    prox_dia_livre = df[df['PED_PREVISAOEMISSAODOC'] > hoje]['PED_PREVISAOEMISSAODOC'].min()
+
+    # Calcular o prazo de entrega
+    prazo_carreta_avulsa = encontrar_proximo_dia_livre(df, prox_dia_livre, 'PED_PREVISAOEMISSAODOC', 15)
+    prazo_carga_fechada = encontrar_proximo_dia_livre(df, prox_dia_livre, 'PED_PREVISAOEMISSAODOC', 5)
+
+    return prazo_carreta_avulsa, prazo_carga_fechada
+
+@app.route('/api/programacao/prazo-entrega', methods=['GET'])
+def prazo_entrega():
+
+    """
+    Api para calcular prazo de entrega com base no dia atual
+    """   
+
+    # conectar com google sheets
+        # coluna de data da carga: PED_PREVISAOEMISSAODOC
+    # buscar o proximo dia livre de carga
+    # definir regra:
+        # 1. Caso seja carreta avulsa: contar 15 dias úteis a partir do próximo dia livre.
+        # 2. Caso seja carga fechada: contar 5 dias úteis a partir do próximo dia livre.
+    # mostrar essa informação atraves de um card no front-end na tela inicial
+    # modelo do texto: 
+        # 1. "Para carretas avulsas, o prazo de entrega é: 20/04/2025."
+        # 2. "Para cargas fechadas, o prazo de entrega é: 20/04/2025."
+
+    prazo_carreta_avulsa, prazo_carga_fechada = tratamento_prazo_entrega()
+
+    return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada})
+
 
 if __name__ == '__main__':
     app.run(port=8000,debug=True)
