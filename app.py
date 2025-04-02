@@ -3821,21 +3821,62 @@ def dados_programacao():
 
 # Função para encontrar o próximo dia livre considerando finais de semana e ocupação
 def encontrar_proximo_dia_livre(df, data_inicial, coluna_data, dias_adicionais):
-    # Adicionar os dias iniciais ao prazo
-    nova_data = data_inicial + timedelta(days=dias_adicionais)
+
+    # conectar com planilha que fala se a carga ta aberta ou fechada
+    load_dotenv(override=True)
+
+    google_credentials_json={
+        "type":os.environ.get('type'),
+        "project_id":os.environ.get('project_id'),
+        "private_key":os.environ.get('private_key'),
+        "private_key_id":os.environ.get('private_key_id'),
+        "client_x509_cert_url":os.environ.get('client_x509_cert_url'),
+        "client_email":os.environ.get('client_email'),
+        "auth_uri":os.environ.get('auth_uri'),
+        "auth_provider_x509_cert_url":os.environ.get('auth_provider_x509_cert_url'),
+        "universe_domain":os.environ.get('universe_domain'),
+        "client_id":os.environ.get('client_id'),
+        "token_uri":os.environ.get('token_uri'),
+    }
+
+    scopes = ['https://www.googleapis.com/auth/spreadsheets',
+                    "https://www.googleapis.com/auth/drive"]
+
+    if google_credentials_json:
+        # credentials_dict = json.loads(google_credentials_json)
+        credentials = Credentials.from_service_account_info(google_credentials_json, scopes=scopes)
+        gc = gspread.authorize(credentials)
+        sh = gc.open_by_key("1olnMhK7OI6W0eJ-dvsi3Lku5eCYqlpzTGJfh1Q7Pv9I")
+        wks = sh.worksheet('Acomp. de cargas formadas')
+
+    data = wks.get_all_values()
     
-    # Loop para garantir que a data não caia em um dia ocupado ou fim de semana
+    df_datas = pd.DataFrame(data[1:], columns=data[0])  # Pulando o cabeçalho
+
+    # Buscando ultima data com status "fechada"
+    ultima_data_fechada = df_datas[df_datas['Status'] == 'fechada'].iloc[[-1]].values[0][0]
+    ultima_data_fechada_date = datetime.strptime(ultima_data_fechada, "%d/%m/%Y")
+    data_inicial = ultima_data_fechada_date
+    df_feriados = df_datas[df_datas['Status'] == 'feriado']
+    df_feriados['Data'] = pd.to_datetime(df_feriados['Data'], format='%d/%m/%Y', errors='coerce')
+
+    # Transformar em lista de objetos datetime
+    datas_feriados = df_feriados['Data'].dropna().tolist()
+
+    # Somar apenas dias úteis
+    nova_data = data_inicial
+    adicionados = 0
+    while adicionados < dias_adicionais:
+        nova_data += timedelta(days=1)
+        if nova_data.weekday() < 5 and nova_data not in datas_feriados:
+            adicionados += 1
+
+    # Verificar se nova_data está ocupada ou cai no fim de semana
     while True:
-        # Se for sábado (5) ou domingo (6), pula para o próximo dia útil
-        if nova_data.weekday() in [5, 6]: 
+        if nova_data.weekday() >= 5 or nova_data in df[coluna_data].values:
             nova_data += timedelta(days=1)
             continue
-        
-        # Verifica se a data já está ocupada
-        if nova_data in df[coluna_data].values:
-            nova_data += timedelta(days=1)  # Empurra para frente
-        else:
-            break  # Data livre encontrada
+        break
     
     return nova_data
 
@@ -3897,8 +3938,8 @@ def prazo_entrega():
         # coluna de data da carga: PED_PREVISAOEMISSAODOC
     # buscar o proximo dia livre de carga
     # definir regra:
-        # 1. Caso seja carreta avulsa: contar 15 dias úteis a partir do próximo dia livre.
-        # 2. Caso seja carga fechada: contar 5 dias úteis a partir do próximo dia livre.
+        # 1. Caso seja carreta avulsa: contar 15 dias úteis a partir do dia da última carga fechada (não conta sabado e domingo nem feriado).
+        # 2. Caso seja carga fechada: contar 5 dias úteis a partir do dia da última carga fechada (não conta sabado e domingo nem feriado).
     # mostrar essa informação atraves de um card no front-end na tela inicial
     # modelo do texto: 
         # 1. "Para carretas avulsas, o prazo de entrega é: 20/04/2025."

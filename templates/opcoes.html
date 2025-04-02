@@ -20,7 +20,7 @@
 {% block container %}
 <div class="container-fluid">
 
-   <!-- <div class="row mb-4">
+   <div class="row mb-4">
       <div class="col-12">
         <h5 class="border-bottom pb-2 mb-3">Prazos de Entrega</h5>
       </div>
@@ -84,7 +84,7 @@
           </div>
         </div>
       </div>
-   </div> -->
+   </div>
 
    <div class="row">
       {% include 'tabelas/tb-pedidos-andamento.html' %}
@@ -258,7 +258,7 @@
 <!-- script com a construção das tabelas -->
 <script src="static/js/demo/datatables-demo.js"></script>
 
-<!-- <script>
+<script>
    document.addEventListener("DOMContentLoaded", () => {
 
       fetch('/api/programacao/prazo-entrega')
@@ -290,6 +290,6 @@
          .catch(error => console.error(error));
 
    })
-</script> -->
+</script>
 
 {% endblock %}
