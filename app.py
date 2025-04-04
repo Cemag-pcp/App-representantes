@@ -155,7 +155,6 @@ def login():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
                             password=DB_PASS, host=DB_HOST)
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -169,7 +168,6 @@ def login():
             return redirect(url_for('opcoes'))
         else:
             flash('Usuário ou Senha inválida', category='error')
-
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -1249,7 +1247,7 @@ def atualizar_regiao():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def opcoes():
-
+    print('testes')
     nomeRepresentante = session['user_id']
     id_representante = idRepresentante(nomeRepresentante)
     type_id = infoRepresentantes(nomeRepresentante)
@@ -1589,7 +1587,10 @@ def ganhar():
     dealId = data['dealId']
     idUltimaProposta = data['idUltimaProposta']
 
-    ganharNegocio(dealId)
+    #Verificar se o negócio foi ganho
+    if ganharNegocio(dealId) == "Impossível ganhar um negócio já ganho":
+        return jsonify({"erro": "Impossível ganhar um negócio já ganho"})
+    
     criarVenda(dealId, idUltimaProposta)
 
     # return render_template('opcoes.html')
@@ -2991,6 +2992,29 @@ def buscarProdutosQuotes(dealId):
 def ganharNegocio(DealId):
     """Função para ganhar negócio"""
 
+    #verificar se o atributo WonQuoteId está null
+    # url = "https://public-api2.ploomes.com/Deals?$filter=Id eq {}".format(DealId)
+
+    # 7670438 negocio que está ganho
+    urlCheckDeal = "https://public-api2.ploomes.com/Deals?$filter=Id eq {}".format(DealId)
+
+    headers = {
+        "User-Key": "5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3"
+    }
+    response = requests.get(urlCheckDeal, headers=headers)
+
+    data = response.json()
+    print(data)
+    print("Ganho?",data['value'][0]['StatusId'])
+    if data['value'][0]['StatusId'] == 2:
+        print('Deal já ganho')
+        return 'Impossível ganhar um negócio já ganho'
+    # else:
+    #     print('Deal ganho')
+    # print(data)
+    # print(data['value'][0]['WonQuoteId'])
+    # print(data['value'][0]['Amount'])
+    print('Deal ainda não ganho')
     atualizarEtapaFechamento(DealId)
 
     json_data = buscarProdutosQuotes(DealId)

@@ -4,6 +4,19 @@ function ganharNegocio(quoteId,dealId) {
     
     showSpinner();
 
+    // Recuperar dado
+    const dealIdLocal = localStorage.getItem('dealId');
+
+    if (dealIdLocal == dealId){
+        exibirMensagem('aviso','Erro! Proposta já ganha.');
+        hideSpinner();
+        window.location.reload();
+        return;
+    }
+    // Armazenar dealId
+    localStorage.setItem('dealId', dealId);
+
+
     var buttonGanhar = document.querySelector('[data-button-id="' + quoteId + '"]');
 
     buttonGanhar.disabled = true;
@@ -22,6 +35,8 @@ function ganharNegocio(quoteId,dealId) {
         body: JSON.stringify(data) // Converta os dados para JSON
     };
 
+    
+
     // Realizar a requisição POST
     fetch('/ganhar', options)
         .then(function(response) {
@@ -36,6 +51,11 @@ function ganharNegocio(quoteId,dealId) {
             hideSpinner();
             exibirMensagem('sucesso','Proposta ganha com sucesso.');
             buttonGanhar.disabled = false;
+            // Remover dado caso der certo
+            if (dealIdLocal){
+                localStorage.removeItem('dealId');
+            }
+            
         })
         .catch(function(error) {
             // Caso ocorra algum erro durante a requisição
@@ -43,5 +63,9 @@ function ganharNegocio(quoteId,dealId) {
             hideSpinner();
             exibirMensagem('aviso','Erro! Tente novamente.');
             buttonGanhar.disabled = false;
+            // Remover dado caso der errado também
+            if (dealIdLocal){
+                localStorage.removeItem('dealId');
+            }
         });
 };
