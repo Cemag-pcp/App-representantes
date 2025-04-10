@@ -25,6 +25,7 @@ from datetime import timedelta
 import gspread
 from google.oauth2.service_account import Credentials
 import os
+import math
 
 from dotenv import load_dotenv
 
@@ -2469,9 +2470,9 @@ def idCarretas(listaProdutos):
 
     # Dicionário com os prazos por classe de produtos
     prazo_por_classe = {
-        1181665: 60, 1181684: 60, 1181686: 60, 1325894: 60, 1375302: 60,
-        1462324: 70, 1479315: 60, 1479336: 80, 1652695: 60, 1655647: 60,
-        1669859: 90, 1669860: 60, 1669861: 90, 1669871: 90
+        1181665: 80, 1181684: 80, 1181686: 80, 1325894: 80, 1375302: 60,
+        1462324: 100, 1479315: 60, 1479336: 120, 1652695: 60, 1655647: 60,
+        1669859: 120, 1669860: 80, 1669861: 120, 1669871: 90
     }
 
     # Define a URL da API
@@ -3843,8 +3844,104 @@ def dados_programacao():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+def proximo_dia_livre(data_inicial, ocupados):
+    data = data_inicial
+    while True:
+        data += timedelta(days=1)
+        if data.weekday() < 5 and data not in ocupados:
+            return data
+
+def somar_dias_uteis(data_inicial, dias_uteis, ocupados):
+    data = data_inicial
+    adicionados = 0
+    while adicionados < dias_uteis:
+        data += timedelta(days=1)
+        if data.weekday() < 5 and data not in ocupados:
+            adicionados += 1
+    return data
+
+def proximo_dia_util(data_inicial, dias):
+    
+    """
+    Soma a quantidade de dias e empurra para frente se cair em sábado ou domingo.
+    Retorna a próxima data útil após a soma.
+    """
+
+    data = data_inicial + timedelta(days=dias)
+
+    # Empurra para segunda-feira se cair no fim de semana
+    while data.weekday() >= 5:  # 5 = sábado, 6 = domingo
+        data += timedelta(days=1)
+
+    return data
+
+def carretas_pendentes():
+
+    # conectar com planilha que fala se a carga ta aberta ou fechada
+    load_dotenv(override=True)
+
+    classe_recurso = [
+            "Carretas Agrícolas com Carroceria Metálica",
+            "Carretas Agrícolas de Madeira",
+            "Carretas Tanque",
+            "Carretas Basculantes hidráulicas",
+            "Carretas Especiais",
+            "Colheitadeira",
+            "Transbordo",
+            "Roçadeiras M24",
+            "Outros Equipamentos",
+            "Produtos de Plantio",
+            "Carretas Agrícolas Fora de Linha"
+        ]
+
+    google_credentials_json={
+        "type":os.environ.get('type'),
+        "project_id":os.environ.get('project_id'),
+        "private_key":os.environ.get('private_key'),
+        "private_key_id":os.environ.get('private_key_id'),
+        "client_x509_cert_url":os.environ.get('client_x509_cert_url'),
+        "client_email":os.environ.get('client_email'),
+        "auth_uri":os.environ.get('auth_uri'),
+        "auth_provider_x509_cert_url":os.environ.get('auth_provider_x509_cert_url'),
+        "universe_domain":os.environ.get('universe_domain'),
+        "client_id":os.environ.get('client_id'),
+        "token_uri":os.environ.get('token_uri'),
+    }
+
+    scopes = ['https://www.googleapis.com/auth/spreadsheets',
+                    "https://www.googleapis.com/auth/drive"]
+
+    if google_credentials_json:
+        # credentials_dict = json.loads(google_credentials_json)
+        credentials = Credentials.from_service_account_info(google_credentials_json, scopes=scopes)
+        gc = gspread.authorize(credentials)
+        sh = gc.open_by_key("1olnMhK7OI6W0eJ-dvsi3Lku5eCYqlpzTGJfh1Q7Pv9I")
+        wks = sh.worksheet('Importar Dados')
+
+    data = wks.get_all_values()
+
+    df_carretas_pendentes = pd.DataFrame(data[1:], columns=data[0])  # Pulando o cabeçalho
+
+    # Buscando ultima data com status "fechada"
+    df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] = pd.to_datetime(df_carretas_pendentes['PED_PREVISAOEMISSAODOC'], format='%d/%m/%Y')
+
+    df_carretas_pendentes = df_carretas_pendentes[
+        (df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] > '2025-12-01') &
+        (df_carretas_pendentes['PED_RECURSO.CLASSE.NOME'].isin(classe_recurso))
+    ]
+    
+    df_carretas_pendentes['PED_QUANTIDADE'] = df_carretas_pendentes['PED_QUANTIDADE'].astype(int)
+
+    qt_carretas = df_carretas_pendentes['PED_QUANTIDADE'].sum()
+
+    # 10 carretas -> 1 carga, 20 carretas -> 2 cargas...
+    # a cada 10 carretas será 1 dia útil a mais
+    qtd_dias_uteis_extras = math.ceil(qt_carretas / 10)
+
+    return qtd_dias_uteis_extras
+
 # Função para encontrar o próximo dia livre considerando finais de semana e ocupação
-def encontrar_proximo_dia_livre(df, data_inicial, coluna_data, dias_adicionais):
+def encontrar_proximo_dia_livre():
 
     # conectar com planilha que fala se a carga ta aberta ou fechada
     load_dotenv(override=True)
@@ -3874,35 +3971,41 @@ def encontrar_proximo_dia_livre(df, data_inicial, coluna_data, dias_adicionais):
         wks = sh.worksheet('Acomp. de cargas formadas')
 
     data = wks.get_all_values()
-    
+
     df_datas = pd.DataFrame(data[1:], columns=data[0])  # Pulando o cabeçalho
 
     # Buscando ultima data com status "fechada"
-    ultima_data_fechada = df_datas[df_datas['Status'] == 'fechada'].iloc[[-1]].values[0][0]
-    ultima_data_fechada_date = datetime.strptime(ultima_data_fechada, "%d/%m/%Y")
-    data_inicial = ultima_data_fechada_date
-    df_feriados = df_datas[df_datas['Status'] == 'feriado']
-    df_feriados['Data'] = pd.to_datetime(df_feriados['Data'], format='%d/%m/%Y', errors='coerce')
+    df_datas['Data'] = pd.to_datetime(df_datas['Data'], format='%d/%m/%Y', errors='coerce')
 
     # Transformar em lista de objetos datetime
-    datas_feriados = df_feriados['Data'].dropna().tolist()
+    # df_datas = df_datas['Data'].dropna().tolist()
 
-    # Somar apenas dias úteis
-    nova_data = data_inicial
-    adicionados = 0
-    while adicionados < dias_adicionais:
-        nova_data += timedelta(days=1)
-        if nova_data.weekday() < 5 and nova_data not in datas_feriados:
-            adicionados += 1
+    # Verificar se existe algum dia útil "livre" dentro do dataframe
+    # Caso seja sabado, domingo, feriado ou fechado não usar o dia
+    # Procurar sempre na data maior que hoje
+    # Lista de feriados e dias fechados
+    dias_indisponiveis = df_datas[df_datas['Status'].isin(['feriado', 'fechada'])]['Data'].dropna().tolist()
 
-    # Verificar se nova_data está ocupada ou cai no fim de semana
-    while True:
-        if nova_data.weekday() >= 5 or nova_data in df[coluna_data].values:
-            nova_data += timedelta(days=1)
-            continue
-        break
+    # Data base: hoje
+    hoje = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     
-    return nova_data
+    # Achar o próximo dia útil livre após hoje
+
+    data_livre = proximo_dia_livre(hoje, dias_indisponiveis)
+
+    # +5 dias úteis a partir do próximo dia livre
+    prazo_5 = somar_dias_uteis(data_livre, 5, dias_indisponiveis)
+
+    qtd_dias_uteis_extras = carretas_pendentes()
+    proximo_dia_util = proximo_dia_util(data_livre, qtd_dias_uteis_extras)
+
+    # somar a quantidade de dias úteis extras
+    dias_soma = proximo_dia_util + timedelta(days=qtd_dias_uteis_extras)
+
+    # +10 dias úteis a partir do prazo +5
+    prazo_10 = somar_dias_uteis(dias_soma, 10, dias_indisponiveis)
+    
+    return prazo_5,prazo_10 
 
 def tratamento_prazo_entrega():
 
@@ -3943,13 +4046,12 @@ def tratamento_prazo_entrega():
     hoje = datetime.today()
 
     # Encontrar o próximo dia livre a partir de hoje
-    prox_dia_livre = df[df['PED_PREVISAOEMISSAODOC'] > hoje]['PED_PREVISAOEMISSAODOC'].min()
+    # prox_dia_livre = df[df['PED_PREVISAOEMISSAODOC'] > hoje]['PED_PREVISAOEMISSAODOC'].min()
 
     # Calcular o prazo de entrega
-    prazo_carreta_avulsa = encontrar_proximo_dia_livre(df, prox_dia_livre, 'PED_PREVISAOEMISSAODOC', 15)
-    prazo_carga_fechada = encontrar_proximo_dia_livre(df, prox_dia_livre, 'PED_PREVISAOEMISSAODOC', 5)
+    prazo_carga_fechada,prazo_carreta_avulsa = encontrar_proximo_dia_livre()
 
-    return prazo_carreta_avulsa, prazo_carga_fechada
+    return prazo_carga_fechada,prazo_carreta_avulsa 
 
 @app.route('/api/programacao/prazo-entrega', methods=['GET'])
 def prazo_entrega():
