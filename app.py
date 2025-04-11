@@ -3997,10 +3997,10 @@ def encontrar_proximo_dia_livre():
     prazo_5 = somar_dias_uteis(data_livre, 5, dias_indisponiveis)
 
     qtd_dias_uteis_extras = carretas_pendentes()
-    proximo_dia_util = proximo_dia_util(data_livre, qtd_dias_uteis_extras)
+    proximo_dia_util_var = proximo_dia_util(data_livre, qtd_dias_uteis_extras)
 
     # somar a quantidade de dias úteis extras
-    dias_soma = proximo_dia_util + timedelta(days=qtd_dias_uteis_extras)
+    dias_soma = proximo_dia_util_var + timedelta(days=qtd_dias_uteis_extras)
 
     # +10 dias úteis a partir do prazo +5
     prazo_10 = somar_dias_uteis(dias_soma, 10, dias_indisponiveis)
@@ -4071,7 +4071,7 @@ def prazo_entrega():
         # 1. "Para carretas avulsas, o prazo de entrega é: 20/04/2025."
         # 2. "Para cargas fechadas, o prazo de entrega é: 20/04/2025."
 
-    prazo_carreta_avulsa, prazo_carga_fechada = tratamento_prazo_entrega()
+    prazo_carga_fechada, prazo_carreta_avulsa = tratamento_prazo_entrega()
 
     return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada})
 
