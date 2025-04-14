@@ -3923,10 +3923,14 @@ def carretas_pendentes():
     df_carretas_pendentes = pd.DataFrame(data[1:], columns=data[0])  # Pulando o cabeçalho
 
     # Buscando ultima data com status "fechada"
-    df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] = pd.to_datetime(df_carretas_pendentes['PED_PREVISAOEMISSAODOC'], format='%d/%m/%Y')
+    df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] = pd.to_datetime(
+        df_carretas_pendentes['PED_PREVISAOEMISSAODOC'], 
+        format='%d/%m/%Y', 
+        errors='coerce'
+    )
 
     df_carretas_pendentes = df_carretas_pendentes[
-        (df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] > '2025-12-01') &
+        (df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] >= '2025-12-01') &
         (df_carretas_pendentes['PED_RECURSO.CLASSE.NOME'].isin(classe_recurso))
     ]
     
