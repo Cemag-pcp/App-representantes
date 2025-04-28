@@ -160,6 +160,9 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        cache_precos.clear()
+        cache_produtos.clear()
+
         cur.execute(
             "SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
         user = cur.fetchone()
