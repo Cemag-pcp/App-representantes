@@ -2397,85 +2397,11 @@ def infoRepresentantes(nomeRepresentante):
 def idCarretas(listaProdutos):
     """Função para buscar o id das carretas"""
 
-    # prazo_por_classe = [
-    #     {
-    #         "Id": 1181665,
-    #         "Name": "Carretas Basculantes hidráulicas",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1181684,
-    #         "Name": "Carretas Agrícolas de Madeira",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1181686,
-    #         "Name": "Carretas Agrícolas com Carroceria Metálica",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1325894,
-    #         "Name": "Carretas Tanque",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1375302,
-    #         "Name": "Carretas Agrícolas",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1462324,
-    #         "Name": "Carretas Especiais",
-    #         "dias": 70
-    #     },
-    #     {
-    #         "Id": 1479315,
-    #         "Name": "Carretas Agrícolas Fora de Linha",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1479336,
-    #         "Name": "Ainda Sem Classificação",
-    #         "dias": 80
-    #     },
-    #     {
-    #         "Id": 1652695,
-    #         "Name": "70 sistemas Prod Especiais",
-    #         "dias":  60
-    #     },
-    #     {
-    #         "Id": 1655647,
-    #         "Name": "70 Sistemas Carretas",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1669859,
-    #         "Name": "Colheitadeira",
-    #         "dias": 90
-    #     },
-    #     {
-    #         "Id": 1669860,
-    #         "Name": "Roçadeiras M24",
-    #         "dias": 60
-    #     },
-    #     {
-    #         "Id": 1669861,
-    #         "Name": "Produtos de Plantio",
-    #         "dias": 90
-    #     },
-    #     {
-    #         "Id": 1669871,
-    #         "Name": "Transbordo",
-    #         "dias": 90
-    #     }
-
-    # ]
-
     # Dicionário com os prazos por classe de produtos
     prazo_por_classe = {
-        1181665: 80, 1181684: 80, 1181686: 80, 1325894: 80, 1375302: 60,
-        1462324: 100, 1479315: 60, 1479336: 120, 1652695: 60, 1655647: 60,
-        1669859: 120, 1669860: 80, 1669861: 120, 1669871: 90
+        1181665: 70, 1181684: 70, 1181686: 70, 1325894: 70, 1375302: 70,
+        1462324: 90, 1479315: 70, 1479336: 120, 1652695: 70, 1655647: 70,
+        1669859: 120, 1669860: 70, 1669861: 120, 1669871: 70
     }
 
     # Define a URL da API

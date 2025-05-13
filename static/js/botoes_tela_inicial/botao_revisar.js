@@ -3,20 +3,20 @@ function confirmarRevisao(lista_product) {
 
     // JSON de prazos por GroupId
     const prazo_por_grupo = [
-        { "GroupId": 1181665, "Name": "Carretas Basculantes hidráulicas", "dias": 80 },
-        { "GroupId": 1181684, "Name": "Carretas Agrícolas de Madeira", "dias": 80 },
-        { "GroupId": 1181686, "Name": "Carretas Agrícolas com Carroceria Metálica", "dias": 80 },
-        { "GroupId": 1325894, "Name": "Carretas Tanque", "dias": 80 },
-        { "GroupId": 1375302, "Name": "Carretas Agrícolas", "dias": 60 },
-        { "GroupId": 1462324, "Name": "Carretas Especiais", "dias": 100 },
-        { "GroupId": 1479315, "Name": "Carretas Agrícolas Fora de Linha", "dias": 60 },
+        { "GroupId": 1181665, "Name": "Carretas Basculantes hidráulicas", "dias": 70 },
+        { "GroupId": 1181684, "Name": "Carretas Agrícolas de Madeira", "dias": 70 },
+        { "GroupId": 1181686, "Name": "Carretas Agrícolas com Carroceria Metálica", "dias": 70 },
+        { "GroupId": 1325894, "Name": "Carretas Tanque", "dias": 70 },
+        { "GroupId": 1375302, "Name": "Carretas Agrícolas", "dias": 70 },
+        { "GroupId": 1462324, "Name": "Carretas Especiais", "dias": 90 },
+        { "GroupId": 1479315, "Name": "Carretas Agrícolas Fora de Linha", "dias": 70 },
         { "GroupId": 1479336, "Name": "Ainda Sem Classificação", "dias": 120 },
-        { "GroupId": 1652695, "Name": "70 sistemas Prod Especiais", "dias": 60 },
-        { "GroupId": 1655647, "Name": "70 Sistemas Carretas", "dias": 60 },
+        { "GroupId": 1652695, "Name": "70 sistemas Prod Especiais", "dias": 70 },
+        { "GroupId": 1655647, "Name": "70 Sistemas Carretas", "dias": 70 },
         { "GroupId": 1669859, "Name": "Colheitadeira", "dias": 120 },
-        { "GroupId": 1669860, "Name": "Roçadeiras M24", "dias": 80 },
+        { "GroupId": 1669860, "Name": "Roçadeiras M24", "dias": 70 },
         { "GroupId": 1669861, "Name": "Produtos de Plantio", "dias": 120 },
-        { "GroupId": 1669871, "Name": "Transbordo", "dias": 90 }
+        { "GroupId": 1669871, "Name": "Transbordo", "dias": 70 }
     ];
 
     // Criar um dicionário para acesso rápido ao prazo por GroupId
@@ -39,7 +39,7 @@ function confirmarRevisao(lista_product) {
 
         let groupId = parseInt(produto.GroupId, 10) || 0; // Garantir que seja numérico
 
-        console.log(`🔹 Processando Produto: ${produto.Id}, Grupo: ${groupId}`);
+        console.log(`Processando Produto: ${produto.Id}, Grupo: ${groupId}`);
 
         let prazo_entrega = prazo_dict[groupId] || 45; // Se não encontrar, assume 45 dias
         max_prazo = Math.max(max_prazo, prazo_entrega);
