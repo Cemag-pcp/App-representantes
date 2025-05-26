@@ -22,67 +22,77 @@
 
    <div class="row mb-4">
       <div class="col-12">
-        <h5 class="border-bottom pb-2 mb-3">Prazos de Entrega</h5>
+         <h5 class="border-bottom pb-2 mb-3">Prazos de Entrega</h5>
       </div>
-      
+
       <div class="col-md-6 mb-3">
-        <div class="card h-100 border-primary">
-          <div class="card-header bg-primary text-white">
+         <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
             <h6 class="mb-0">Prazo Para Carga Fechada</h6>
-          </div>
-          <div class="card-body">
+            </div>
+            <div class="card-body">
             <div class="d-flex align-items-center mb-3">
-              <div class="me-3">
-                <i class="fas fa-truck-loading fa-2x text-primary"></i>
-              </div>
-              <div>
-                <h3 class="mb-0 data-formatada" id="data_prazo_carga_fechada">
+               <div class="me-3">
+                  <i class="fas fa-truck-loading fa-2x text-primary"></i>
+               </div>
+               <div>
+                  <h3 class="mb-0 data-formatada" id="data_prazo_carga_fechada">
                   <div class="spinner-border text-primary" role="status">
                      <span class="sr-only">Loading...</span>
                   </div>
-                </h3>
-                <small class="text-muted">Prazo de entrega previsto</small>
-              </div>
+                  </h3>
+                  <small class="text-muted">Prazo de entrega previsto</small>
+                  <div>
+                  <small class="text-muted">
+                     <span id="dias_corridos_carga_fechada"> </span> dias corridos
+                  </small>
+                  </div>
+               </div>
             </div>
             <div class="mt-3">
                <p class="card-text">
-                 <small class="text-muted">
+                  <small class="text-muted">
                   Previsão de prazo para entregas de carga fechada.
-                 </small>
+                  </small>
                </p>
-             </div>
-          </div>
-        </div>
+            </div>
+            </div>
+         </div>
       </div>
-      
+
       <div class="col-md-6 mb-3">
-        <div class="card h-100 border-success">
-          <div class="card-header bg-success text-white">
+         <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
             <h6 class="mb-0">Prazo Para Carreta Avulsa</h6>
-          </div>
-          <div class="card-body">
+            </div>
+            <div class="card-body">
             <div class="d-flex align-items-center mb-3">
-              <div class="me-3">
-                <i class="fas fa-truck fa-2x text-success"></i>
-              </div>
-              <div>
-                <h3 class="mb-0 data-formatada" id="data_prazo_carreta_avulsa">
+               <div class="me-3">
+                  <i class="fas fa-truck fa-2x text-success"></i>
+               </div>
+               <div>
+                  <h3 class="mb-0 data-formatada" id="data_prazo_carreta_avulsa">
                   <div class="spinner-border text-primary" role="status">
                      <span class="sr-only">Loading...</span>
                   </div>
-                </h3>
-                <small class="text-muted">Prazo de entrega previsto</small>
-              </div>
+                  </h3>
+                  <small class="text-muted">Prazo de entrega previsto</small>
+                  <div>
+                  <small class="text-muted">
+                     <span id="dias_corridos_carreta_avulsa"> </span> dias corridos
+                  </small>
+                  </div>
+               </div>
             </div>
             <div class="mt-3">
-              <p class="card-text">
-                <small class="text-muted">
+               <p class="card-text">
+                  <small class="text-muted">
                   Previsão de prazo para carreta individual. Aplicável para cargas parciais.
-                </small>
-              </p>
+                  </small>
+               </p>
             </div>
-          </div>
-        </div>
+            </div>
+         </div>
       </div>
    </div>
 
@@ -259,37 +269,46 @@
 <script src="static/js/demo/datatables-demo.js"></script>
 
 <script>
-   document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-      fetch('/api/programacao/prazo-entrega')
-         .then(response => response.json())
-         .then(data => {
-            const prazoCargaFechada = data.prazo_carga_fechada;
-            const prazoCarretaAvulsa = data.prazo_carreta_avulsa;
+  fetch('/api/programacao/prazo-entrega')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      const prazoCargaFechada = data.prazo_carga_fechada;
+      const prazoCarretaAvulsa = data.prazo_carreta_avulsa;
+      const diasCorridosCargaFechada = data.dias_corridos_fechada;
+      const diasCorridosCarretaAvulsa = data.dias_corridos_avulsa;
 
-            let prazoCargaFechadaFormatado = new Date(prazoCargaFechada);
-            prazoCargaFechadaFormatado.setDate(prazoCargaFechadaFormatado.getDate() + 1);
-            prazoCargaFechadaFormatado = prazoCargaFechadaFormatado.toLocaleDateString('pt-BR', {
-               year: 'numeric',
-               month: '2-digit',
-               day: '2-digit'
-            });
+      // Formata datas para exibição (adicionando +1 dia para ajuste de timezone)
+      let prazoCargaFechadaFormatado = new Date(prazoCargaFechada);
+      prazoCargaFechadaFormatado.setDate(prazoCargaFechadaFormatado.getDate() + 1);
+      prazoCargaFechadaFormatado = prazoCargaFechadaFormatado.toLocaleDateString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
 
-            let prazoCarretaAvulsaFormatada = new Date(prazoCarretaAvulsa);
-            prazoCarretaAvulsaFormatada.setDate(prazoCarretaAvulsaFormatada.getDate() + 1);
-            prazoCarretaAvulsaFormatada = prazoCarretaAvulsaFormatada.toLocaleDateString('pt-BR', {
-               year: 'numeric',
-               month: '2-digit',
-               day: '2-digit'
-            });
+      let prazoCarretaAvulsaFormatado = new Date(prazoCarretaAvulsa);
+      prazoCarretaAvulsaFormatado.setDate(prazoCarretaAvulsaFormatado.getDate() + 1);
+      prazoCarretaAvulsaFormatado = prazoCarretaAvulsaFormatado.toLocaleDateString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
 
-            document.getElementById('data_prazo_carga_fechada').textContent = prazoCargaFechadaFormatado;
-            document.getElementById('data_prazo_carreta_avulsa').textContent = prazoCarretaAvulsaFormatada;
+      // Atualiza as datas formatadas
+      document.getElementById('data_prazo_carga_fechada').textContent = prazoCargaFechadaFormatado;
+      document.getElementById('data_prazo_carreta_avulsa').textContent = prazoCarretaAvulsaFormatado;
 
-         })
-         .catch(error => console.error(error));
+      // Atualiza os dias corridos
+      document.getElementById('dias_corridos_carga_fechada').textContent = diasCorridosCargaFechada;
+      document.getElementById('dias_corridos_carreta_avulsa').textContent = diasCorridosCarretaAvulsa;
 
-   })
+    })
+    .catch(error => console.error(error));
+
+});
 </script>
 
 {% endblock %}

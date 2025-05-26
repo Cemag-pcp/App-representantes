@@ -4006,7 +4006,18 @@ def prazo_entrega():
 
     prazo_carga_fechada, prazo_carreta_avulsa = tratamento_prazo_entrega()
 
-    return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada})
+    hoje = date.today()
+
+    if isinstance(prazo_carga_fechada, datetime):
+        prazo_carga_fechada = prazo_carga_fechada.date()
+    if isinstance(prazo_carreta_avulsa, datetime):
+        prazo_carreta_avulsa = prazo_carreta_avulsa.date()
+
+    dias_corridos_fechada = (prazo_carga_fechada - hoje).days
+    dias_corridos_avulsa = (prazo_carreta_avulsa - hoje).days
+
+    return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada,
+                     'dias_corridos_fechada':dias_corridos_fechada, 'dias_corridos_avulsa':dias_corridos_avulsa})
 
 
 if __name__ == '__main__':
