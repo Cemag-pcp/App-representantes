@@ -3527,13 +3527,13 @@ def get_db_connection():
     )
 
 # Endpoint para a pesquisa
-@app.route('/pesquisa1/<int:contact_id>', methods=['GET', 'POST'])
-def pesquisa1(contact_id):
+@app.route('/pesquisa1/<int:contact_id>/<versao>/', methods=['GET', 'POST'])
+def pesquisa1(contact_id, versao):
     conn = get_db_connection()
     cur = conn.cursor()
 
     # Verificar se o usuário já respondeu à pesquisa
-    cur.execute("SELECT 1 FROM respostas WHERE contact_id = %s LIMIT 1", (contact_id,))
+    cur.execute("SELECT 1 FROM respostas WHERE contact_id = %s and versao = %s LIMIT 1", (contact_id,versao,))
     ja_respondeu = cur.fetchone()
 
     if ja_respondeu:
@@ -3549,11 +3549,11 @@ def pesquisa1(contact_id):
             if pergunta_id.isdigit():  # IDs de perguntas
                 valores = request.form.getlist(pergunta_id)  # Captura todos os valores selecionados
                 for valor in valores:
-                    respostas.append((contact_id, int(pergunta_id), valor))
+                    respostas.append((contact_id, int(pergunta_id), valor, versao))
 
         # Inserir respostas no banco
         query = """
-            INSERT INTO respostas (contact_id, pergunta_id, resposta) 
+            INSERT INTO respostas (contact_id, pergunta_id, resposta, versao) 
             VALUES %s
         """
         execute_values(cur, query, respostas)
@@ -3565,13 +3565,13 @@ def pesquisa1(contact_id):
         return redirect(url_for('obrigado'))
 
     # Obter perguntas do banco
-    cur.execute("SELECT id, texto, tipo, opcoes FROM perguntas ORDER BY id ASC")
+    cur.execute("SELECT id, texto, tipo, opcoes FROM perguntas WHERE versao = 'v2' ORDER BY id ASC")
     perguntas = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return render_template('pesquisas/pesquisa1.html', perguntas=perguntas, contact_id=contact_id)
+    return render_template('pesquisas/pesquisa2.html', perguntas=perguntas, contact_id=contact_id)
 
 @app.route('/obrigado')
 def obrigado():
