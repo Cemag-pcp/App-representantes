@@ -1917,6 +1917,13 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
     products = []
     total = 0
 
+    uf = get_estado_por_deal(DealId)
+
+    if uf == 'CE':
+        tipoFrete = 57972827
+    else:
+        tipoFrete = 22886508
+
     for i, product in enumerate(lista_product):
         total += product["Price"]
 
@@ -1994,9 +2001,10 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
                 "FieldKey": "quote_E85539A9-D0D3-488E-86C5-66A49EAF5F3A",  # Condições de pagamento
                 "IntegerValue": id_CondicaoPagamento
             },
+            # se for CE é 57972827 se não é 22886508
             {
                 "FieldKey": "quote_F879E39D-E6B9-4026-8B4E-5AD2540463A3",  # Tipo de frete
-                "IntegerValue": 22886508
+                "IntegerValue": tipoFrete
             },
             {
                 "FieldKey": "quote_6D0FC2AB-6CCC-4A65-93DD-44BF06A45ABE",  # Validade
@@ -2156,6 +2164,13 @@ def revisarProposta(df, idQuote):
 
     max_prazo = max([product["Prazo"] for product in lista_product], default=0)
 
+    uf = get_estado_por_deal(DealId)
+
+    if uf == 'CE':
+        tipoFrete = 57972827
+    else:
+        tipoFrete = 22886508
+
     # Estrutura JSON principal com a lista de produtos
     json_data = {
         "Id": idQuote,
@@ -2206,7 +2221,7 @@ def revisarProposta(df, idQuote):
             },
             {
                 "FieldKey": "quote_F879E39D-E6B9-4026-8B4E-5AD2540463A3",  # Tipo de frete
-                "IntegerValue": 22886508
+                "IntegerValue": tipoFrete
             },
             {
                 "FieldKey": "quote_6D0FC2AB-6CCC-4A65-93DD-44BF06A45ABE",  # Validade
@@ -3420,7 +3435,6 @@ def criarRegistroInteracao(nome_empresa,registro,dataRegistro,contatoRegistro,re
     # Fazendo a requisição POST com os dados no corpo
     requests.post(url, headers=headers, json=data)
 
-
 def atualizandoContato(nome_empresa,contatoRegistro,idDeals):
     """Função para gerar ordem de Empresa"""
 
@@ -3450,7 +3464,6 @@ def atualizandoContato(nome_empresa,contatoRegistro,idDeals):
 
     # Fazendo a requisição POST com os dados no corpo
     requests.patch(url, headers=headers, json=data)
-
 
 def buscarRegiaoCliente_id(idCliente):
     """Função para buscar a região por cliente"""
@@ -4019,6 +4032,46 @@ def prazo_entrega():
     return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada,
                      'dias_corridos_fechada':dias_corridos_fechada, 'dias_corridos_avulsa':dias_corridos_avulsa})
 
+def get_estado_por_deal(deal_id: int):
+    """
+    Retorna o UF (State.Short, ex.: 'SP') do cliente vinculado ao Deal.
+    Pode retornar None se não houver cidade/estado preenchidos.
+    """
+    headers = {"User-Key": '5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3'}
+
+    # 1) Pega o contato ligado ao Deal
+    url_deal = f"https://api2.ploomes.com/Deals?$filter=Id eq {deal_id}&$select=Id,ContactId"
+    r = requests.get(url_deal, headers=headers, timeout=30)
+    r.raise_for_status()
+    deals = r.json().get("value", [])
+    if not deals:
+        raise ValueError(f"Deal {deal_id} não encontrado.")
+    contact_id = deals[0].get("ContactId")
+    if not contact_id:
+        # Se o negócio estiver ligado a empresa (OrganizationId) e não a um contato,
+        # você pode trocar abaixo para Organizations(contact_org_id) e expandir City/State.
+        raise ValueError(f"Deal {deal_id} não possui ContactId vinculado.")
+
+    # 2) Pega City->State do Contato
+    # Expand aninhado: Contact -> City -> State e seleciona o Short do State
+    url_contact = (
+        f"https://api2.ploomes.com/Contacts?"
+        f"$filter=Id eq {contact_id}"
+        "&$select=Id"
+        "&$expand=City($select=Id,Name;"
+        "  $expand=State($select=Short,Name))"
+    )
+    r2 = requests.get(url_contact, headers=headers, timeout=30)
+    r2.raise_for_status()
+    contact = r2.json()
+    contact_obj = (contact.get("value") or [{}])[0]  # pega o 1º item da coleção
+
+    state = (
+        contact_obj.get("City", {})
+               .get("State", {})
+               .get("Short")
+    )
+    return state  # ex.: 'SP' ou None
 
 if __name__ == '__main__':
     app.run(port=8000,debug=True,host='0.0.0.0')
