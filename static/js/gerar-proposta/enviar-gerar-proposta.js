@@ -136,7 +136,7 @@ function copiarItensETotalParaAreaDeTransferencia() {
 
     textToCopy += `Total: ${totalFormatado}`;
 
-    // navigator.clipboard.writeText(textToCopy).catch(function(err) {
-    //     console.error('Erro ao copiar para a área de transferência: ', err);
-    // });
+    navigator.clipboard.writeText(textToCopy).catch(function(err) {
+        console.error('Erro ao copiar para a área de transferência: ', err);
+    });
 }
