@@ -1203,10 +1203,10 @@ def process_data():
     
     deal_id = criarOrdem(data['nomeCliente'], data['idCliente'], nomeContato, session['user_id'])
 
-    try:
-        criarProposta(deal_id, data['observacao'], data['formaPagamento'], session['user_id'], listaProdutos, listaCores, listaPreco, listaQuantidade, listaPrecoUnitario, listaPercentDesconto)
-    except:
-        return jsonify({'message': 'error'})
+    # try:
+    criarProposta(deal_id, data['observacao'], data['formaPagamento'], session['user_id'], listaProdutos, listaCores, listaPreco, listaQuantidade, listaPrecoUnitario, listaPercentDesconto)
+    # except:
+    #     return jsonify({'message': 'error'})
     
     # atualizarEtapaProposta(deal_id)
     enviar_email(session['user_id'], data['nomeCliente'], deal_id)
@@ -1917,11 +1917,13 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
     products = []
     total = 0
 
-    uf = get_estado_por_deal(DealId)
-
-    if uf == 'CE':
-        tipoFrete = 57972827
-    else:
+    try:
+        uf = get_estado_por_deal(DealId)
+        if uf == 'CE':
+            tipoFrete = 57972827
+        else:
+            tipoFrete = 22886508
+    except:
         tipoFrete = 22886508
 
     for i, product in enumerate(lista_product):
@@ -2021,7 +2023,7 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
     #     json_data["ApprovalStatusId"] = 1
     #     json_data["ApprovalLevelId"] = 6216
 
-    print(json_data)
+    print('json: ', json_data)
 
     # Converte a estrutura JSON em uma string JSON
     # json_string = json.dumps(json_data, indent=2)
@@ -2034,8 +2036,6 @@ def criarProposta(DealId, observacao, formaPagamento, nomeRepresentante, listaPr
     }
 
     requests.post(url, headers=headers, json=json_data)
-
-    
 
     return "Proposta criada"
 
@@ -2164,11 +2164,13 @@ def revisarProposta(df, idQuote):
 
     max_prazo = max([product["Prazo"] for product in lista_product], default=0)
 
-    uf = get_estado_por_deal(DealId)
-
-    if uf == 'CE':
-        tipoFrete = 57972827
-    else:
+    try:
+        uf = get_estado_por_deal(DealId)
+        if uf == 'CE':
+            tipoFrete = 57972827
+        else:
+            tipoFrete = 22886508
+    except:
         tipoFrete = 22886508
 
     # Estrutura JSON principal com a lista de produtos
@@ -3125,7 +3127,6 @@ def criarVenda(dealId, idUltimaProposta):
 
         # Crie uma nova seção para cada produto
         json1["Sections"][0]['Products'].append(new_product[0])
-
 
     print(json1)
 
