@@ -3873,7 +3873,7 @@ def carretas_pendentes():
     )
 
     df_carretas_pendentes = df_carretas_pendentes[
-        (df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] >= '2025-12-01') &
+        (df_carretas_pendentes['PED_PREVISAOEMISSAODOC'] >= '2026-12-12') &
         (df_carretas_pendentes['PED_RECURSO.CLASSE.NOME'].isin(classe_recurso))
     ]
     
@@ -3937,22 +3937,26 @@ def encontrar_proximo_dia_livre():
     hoje = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     
     # Achar o próximo dia útil livre após hoje
-
     data_livre = proximo_dia_livre(hoje, dias_indisponiveis)
+    print('data_livre: ', data_livre)
 
     # +5 dias úteis a partir do próximo dia livre
     prazo_5 = somar_dias_uteis(data_livre, 5, dias_indisponiveis)
+    print('prazo_5: ', prazo_5)
 
     qtd_dias_uteis_extras = carretas_pendentes()
     proximo_dia_util_var = proximo_dia_util(data_livre, qtd_dias_uteis_extras)
+    print('qtd_dias_uteis_extras: ', qtd_dias_uteis_extras)
 
     # somar a quantidade de dias úteis extras
     dias_soma = proximo_dia_util_var + timedelta(days=qtd_dias_uteis_extras)
+    print('dias_soma: ', dias_soma)
 
     # +10 dias úteis a partir do prazo +5
     prazo_10 = somar_dias_uteis(dias_soma, 10, dias_indisponiveis)
-    
-    return prazo_5,prazo_10 
+    print('prazo_10: ', prazo_10)
+
+    return prazo_5,prazo_10
 
 def tratamento_prazo_entrega():
 

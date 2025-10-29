@@ -2,6 +2,7 @@ function confirmarRevisao(lista_product) {
     let products = [];
 
     // JSON de prazos por GroupId
+    // lembrar de alterar tambem dentro de app.py
     const prazo_por_grupo = [
         { "GroupId": 1181665, "Name": "Carretas Basculantes hidráulicas", "dias": 60 },
         { "GroupId": 1181684, "Name": "Carretas Agrícolas de Madeira", "dias": 60 },
