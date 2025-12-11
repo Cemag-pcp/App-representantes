@@ -4016,6 +4016,8 @@ def prazo_entrega():
     # definir regra:
         # 1. Caso seja carreta avulsa: contar 15 dias úteis a partir do dia da última carga fechada (não conta sabado e domingo nem feriado).
         # 2. Caso seja carga fechada: contar 5 dias úteis a partir do dia da última carga fechada (não conta sabado e domingo nem feriado).
+        # 3. Minimo de 35 dias para carga avulsa
+        # 4. Minimo de 25 dias para carga fechada
     # mostrar essa informação atraves de um card no front-end na tela inicial
     # modelo do texto: 
         # 1. "Para carretas avulsas, o prazo de entrega é: 20/04/2025."
@@ -4025,18 +4027,36 @@ def prazo_entrega():
 
     hoje = date.today()
 
+    # Garantir que são date (não datetime)
     if isinstance(prazo_carga_fechada, datetime):
         prazo_carga_fechada = prazo_carga_fechada.date()
     if isinstance(prazo_carreta_avulsa, datetime):
         prazo_carreta_avulsa = prazo_carreta_avulsa.date()
 
+    # Calcula dias corridos originais
     dias_corridos_fechada = (prazo_carga_fechada - hoje).days
     dias_corridos_avulsa = (prazo_carreta_avulsa - hoje).days
 
-    #Minimo de 35 dias para carga avulsa
-    dias_corridos_avulsa if dias_corridos_avulsa > 35 else 35
-    #Minimo de 25 dias para carga fechada
-    dias_corridos_fechada if dias_corridos_fechada > 25 else 25
+    # Regras de mínimo
+    MIN_FECHADA = 25
+    MIN_AVULSA = 35
+
+    # Ajusta a DATA e depois recalcula os dias
+
+    # Carreta avulsa: mínimo 35 dias
+    if dias_corridos_avulsa < MIN_AVULSA:
+        prazo_carreta_avulsa = hoje + timedelta(days=MIN_AVULSA)
+        dias_corridos_avulsa = MIN_AVULSA  # já ajusta a variável também
+    else:
+        # mantém o valor calculado
+        dias_corridos_avulsa = dias_corridos_avulsa
+
+    # Carga fechada: mínimo 25 dias
+    if dias_corridos_fechada < MIN_FECHADA:
+        prazo_carga_fechada = hoje + timedelta(days=MIN_FECHADA)
+        dias_corridos_fechada = MIN_FECHADA
+    else:
+        dias_corridos_fechada = dias_corridos_fechada
 
     return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada,
                      'dias_corridos_fechada':dias_corridos_fechada, 'dias_corridos_avulsa':dias_corridos_avulsa})
