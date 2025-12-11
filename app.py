@@ -1251,7 +1251,6 @@ def atualizar_regiao():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def opcoes():
-    print('testes')
     nomeRepresentante = session['user_id']
     id_representante = idRepresentante(nomeRepresentante)
     type_id = infoRepresentantes(nomeRepresentante)
@@ -1750,7 +1749,7 @@ def chamadaCondicoes(nameCliente):
 
         contacts = data['value']
 
-        input_id = 189049  # O ID que você deseja filtrar
+        input_id = 189049
 
         lista_opcoes = []
         for contact in contacts:
@@ -4033,6 +4032,11 @@ def prazo_entrega():
 
     dias_corridos_fechada = (prazo_carga_fechada - hoje).days
     dias_corridos_avulsa = (prazo_carreta_avulsa - hoje).days
+
+    #Minimo de 35 dias para carga avulsa
+    dias_corridos_avulsa if dias_corridos_avulsa > 35 else 35
+    #Minimo de 25 dias para carga fechada
+    dias_corridos_fechada if dias_corridos_fechada > 25 else 25
 
     return jsonify({'prazo_carreta_avulsa':prazo_carreta_avulsa, 'prazo_carga_fechada':prazo_carga_fechada,
                      'dias_corridos_fechada':dias_corridos_fechada, 'dias_corridos_avulsa':dias_corridos_avulsa})
