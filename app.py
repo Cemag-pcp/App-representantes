@@ -2415,9 +2415,9 @@ def idCarretas(listaProdutos):
 
     # Dicionário com os prazos por classe de produtos
     prazo_por_classe = {
-        1181665: 60, 1181684: 60, 1181686: 60, 1325894: 60, 1375302: 60,
+        1181665: 45, 1181684: 45, 1181686: 45, 1325894: 45, 1375302: 60,
         1462324: 90, 1479315: 60, 1479336: 120, 1652695: 60, 1655647: 60,
-        1669859: 120, 1669860: 60, 1669861: 120, 1669871: 60
+        1669859: 365, 1669860: 45, 1669861: 365, 1669871: 45
     }
 
     # Define a URL da API
@@ -3516,6 +3516,8 @@ def infoProposta(quoteId):
         if property['FieldKey'] == 'quote_0FB9F0CB-2619-44C5-92BD-1A2D2D818BFE':
             # Se corresponder, adiciona a propriedade à lista de propriedades filtradas
             filtered_properties.append(property)
+
+    print(filtered_properties)
 
     formaPagamento = filtered_properties[0]['ObjectValueName']
     idFormaPagamento = filtered_properties[0]['Id']
