@@ -2740,16 +2740,20 @@ def enviar_email(nomeRepresentante, nomeCliente, DealId):
     corpo_email = obterDocumentoPdf(DealId)
 
     # Configurações do servidor SMTP
-    smtp_host = 'smtp.gmail.com'
-    smtp_port = 587
-    smtp_user = 'sistema@cemag.com.br'
-    smtp_password = 'qlxn ible gdmg yamz'
+    smtp_host = os.getenv('smtp_host')
+    smtp_port = int(os.getenv('smtp_port', '587'))
+    smtp_user = os.getenv('smtp_user')
+    smtp_password = os.getenv('smtp_password')
+
+    if not smtp_host or not smtp_user or not smtp_password:
+        raise ValueError(
+            "Variáveis SMTP ausentes no .env: smtp_host, smtp_user e smtp_password.")
 
     for email in email_representante:
 
         # Crie uma mensagem de e-mail
         mensagem = MIMEMultipart()
-        mensagem['From'] = 'sistema@cemag.com.br'
+        mensagem['From'] = smtp_user
         mensagem['To'] = email
         mensagem['Subject'] = 'Proposta Ploomes para o cliente {}'.format(
             nomeCliente)
