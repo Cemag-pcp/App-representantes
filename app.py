@@ -4022,8 +4022,8 @@ def prazo_entrega():
     # definir regra:
         # 1. Caso seja carreta avulsa: contar 15 dias úteis a partir do dia da última carga fechada (não conta sabado e domingo nem feriado).
         # 2. Caso seja carga fechada: contar 5 dias úteis a partir do dia da última carga fechada (não conta sabado e domingo nem feriado).
-        # 3. Minimo de 35 dias para carga avulsa
-        # 4. Minimo de 25 dias para carga fechada
+        # 3. Minimo de 40 dias para carga avulsa
+        # 4. Minimo de 30 dias para carga fechada
     # mostrar essa informação atraves de um card no front-end na tela inicial
     # modelo do texto: 
         # 1. "Para carretas avulsas, o prazo de entrega é: 20/04/2025."
@@ -4044,8 +4044,8 @@ def prazo_entrega():
     dias_corridos_avulsa = (prazo_carreta_avulsa - hoje).days
 
     # Regras de mínimo
-    MIN_FECHADA = 25
-    MIN_AVULSA = 35
+    MIN_FECHADA = 30
+    MIN_AVULSA = 40
 
     # Ajusta a DATA e depois recalcula os dias
 
