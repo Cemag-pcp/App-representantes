@@ -8,10 +8,8 @@ function ganharNegocio(quoteId,dealId) {
     const dealIdLocal = localStorage.getItem('dealId');
 
     if (dealIdLocal == dealId){
-        exibirMensagem('aviso','Erro! Proposta já ganha.');
-        hideSpinner();
-        window.location.reload();
-        return;
+        // Trava de uma tentativa anterior que não foi limpa corretamente: libera e tenta de novo
+        localStorage.removeItem('dealId');
     }
     // Armazenar dealId
     localStorage.setItem('dealId', dealId);
@@ -46,26 +44,36 @@ function ganharNegocio(quoteId,dealId) {
             return response.json(); // Se a resposta estiver em JSON, você pode acessá-la aqui
         })
         .then(function(data) {
-            // Manipule a resposta aqui, se necessário
-            applyFilters();
+            // A trava do localStorage é só para esta tentativa: sempre remover ao final
+            localStorage.removeItem('dealId');
+
+            if (data && data.erro) {
+                hideSpinner();
+                exibirMensagem('aviso', data.erro);
+                buttonGanhar.disabled = false;
+                return;
+            }
+
+            // Esconde os botões de Ganhar/Perder na hora, sem depender do
+            // refetch da API externa (que pode demorar a refletir o ganho)
+            const row = buttonGanhar.closest('tr');
+            buttonGanhar.style.display = 'none';
+            if (row) {
+                const botaoPerderRow = row.querySelector('[data-target="#modalPerderNegocio"]');
+                if (botaoPerderRow) {
+                    botaoPerderRow.style.display = 'none';
+                }
+            }
+
             hideSpinner();
             exibirMensagem('sucesso','Proposta ganha com sucesso.');
-            buttonGanhar.disabled = false;
-            // Remover dado caso der certo
-            if (dealIdLocal){
-                localStorage.removeItem('dealId');
-            }
-            
         })
         .catch(function(error) {
             // Caso ocorra algum erro durante a requisição
             console.error('Erro durante a requisição:', error);
+            localStorage.removeItem('dealId');
             hideSpinner();
             exibirMensagem('aviso','Erro! Tente novamente.');
             buttonGanhar.disabled = false;
-            // Remover dado caso der errado também
-            if (dealIdLocal){
-                localStorage.removeItem('dealId');
-            }
         });
 };

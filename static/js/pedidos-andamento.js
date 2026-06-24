@@ -58,7 +58,6 @@ function preencherTabela(data) {
         botaoRevisar.style.color = 'white';
         botaoRevisar.style.backgroundColor = 'gray';
         botaoRevisar.style.marginRight = '10px';
-        botaoRevisar.setAttribute('data-button-id',deal.Id);
         botaoRevisar.setAttribute('href', '/consulta-preco/' + deal.ContactId + '/' + deal.Id + '/' + deal.Deal.Id);
 
         botaoRevisar.addEventListener('click', function(){

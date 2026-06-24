@@ -2936,7 +2936,7 @@ def buscarProdutosQuotes(dealId):
         # Adicione o novo dicionário à lista de Products no segundo JSON
         json_win['Order']["Products"].append(new_product)
 
-    return json_produtos
+    return json_win
 
 
 def ganharNegocio(DealId):
@@ -2975,7 +2975,8 @@ def ganharNegocio(DealId):
         "User-Key": "5151254EB630E1E946EA7D1F595F7A22E4D2947FA210A36AD214D0F98E4F45D3EF272EE07FCF09BB4AEAEA13976DCD5E1EE313316FD9A5359DA88975965931A3",
     }
 
-    requests.post(url, headers=headers, json=json_data)
+    win_response = requests.post(url, headers=headers, json=json_data)
+    win_response.raise_for_status()
 
     return "Negócio ganho"
 
