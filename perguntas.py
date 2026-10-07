@@ -18,22 +18,9 @@ cur = conn.cursor()
 
 # Função para criar perguntas
 def criar_perguntas():
+    versao = "v2"
+
     perguntas = [
-        {
-            "texto": "Como você avalia o atendimento do nosso representante de vendas?",
-            "tipo": "radio",
-            "opcoes": ["Péssimo", "Ruim", "Regular", "Bom", "Ótimo"]
-        },
-        {
-            "texto": "Como você avalia o tempo de resposta para cotações?",
-            "tipo": "radio",
-            "opcoes": ["Péssimo", "Ruim", "Regular", "Bom", "Ótimo"]
-        },
-        {
-            "texto": "Como você avalia o cumprimento ao prazo de entrega dos produtos?",
-            "tipo": "radio",
-            "opcoes": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-        },
         {
             "texto": "Como você avalia o nível de dificuldade da montagem das carretas?",
             "tipo": "radio",
@@ -42,23 +29,21 @@ def criar_perguntas():
         {
             "texto": "Alguma das partes abaixo apresentou dificuldade na montagem?",
             "tipo": "checkbox",
-            "opcoes": ["Pino de articulação", "Tampas", "Eixos", "Quinta roda", "Cilindro"]
-        },
-        {
-            "texto": "Observações",
-            "tipo": "text",
-            "opcoes": None
+            "opcoes": [
+                "Pino de articulação", "Tampas", "Eixos", "Quinta roda", "Cilindro",
+                "Mangueiras e conexões", "Plataforma no chassi", "Molas", "Rodas"
+            ]
         }
     ]
 
     # Query para inserir os dados
     query = """
-        INSERT INTO perguntas (texto, tipo, opcoes) VALUES %s
+        INSERT INTO perguntas (texto, tipo, opcoes, versao) VALUES %s
     """
 
     # Formatar os valores para inserção
     values = [
-        (pergunta["texto"], pergunta["tipo"], pergunta["opcoes"]) for pergunta in perguntas
+        (pergunta["texto"], pergunta["tipo"], pergunta["opcoes"], versao) for pergunta in perguntas
     ]
 
     # Inserir múltiplos registros de uma vez
